@@ -6,15 +6,12 @@ import {ISuperToken} from "@superfluid-finance/ethereum-contracts/contracts/inte
 import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 
 contract SuperUnlockable is ERC721URIStorage {
-    uint256 public currentTokenId = 0;
-
     using SuperTokenV1Library for ISuperToken;
-
     ISuperToken internal immutable supportedToken;
+
+    uint256 public currentTokenId = 0;
     address public owner;
     uint256 public requiredDeposit;
-
-    mapping(address => uint256) public userUsedDeposit;
 
     constructor(
         ISuperToken _supportedToken,
@@ -25,30 +22,29 @@ contract SuperUnlockable is ERC721URIStorage {
         requiredDeposit = _requiredDeposit;
     }
 
-    function setRequiredDeposit(uint256 _amount) public {
-        require(msg.sender == owner, "Not owner");
+    modifier onlyOwner() {
+        require(msg.sender == owner, "SuperUnlockable: No permission");
+        _;
+    }
+
+    function setRequiredDeposit(uint256 _amount) public onlyOwner {
         requiredDeposit = _amount;
     }
 
-    function mintItem(
-        address _to,
-        string memory _tokenURI
-    ) public returns (uint256) {
-        (, int96 flowRate, uint256 deposit, ) = supportedToken.getFlowInfo(
+    function mintItem(address _to, string memory _tokenURI) public {
+        (uint256 lastUpdated, int96 flowRate, , ) = supportedToken.getFlowInfo(
             msg.sender,
             address(this)
         );
-        require(flowRate > 0, "No flow");
-        // Check if the user has enough remaining deposit to mint
+        uint256 totalDeposited = uint256(uint96(flowRate)) *
+            (block.timestamp - lastUpdated);
         require(
-            deposit - userUsedDeposit[msg.sender] >= requiredDeposit,
-            "Not enough deposit to mint"
+            totalDeposited >= requiredDeposit,
+            "SuperUnlockable: Not enough deposit"
         );
-        userUsedDeposit[msg.sender] += requiredDeposit;
         _safeMint(_to, currentTokenId);
         _setTokenURI(currentTokenId, _tokenURI);
         currentTokenId++;
-        return currentTokenId - 1;
     }
 
     function getFlowInfo(
