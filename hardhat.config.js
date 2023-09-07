@@ -10,7 +10,7 @@ task("deploy", "Deploys Contract", async () => {
 
 task("getFlowInfo", "Gets Flow Info from contract", async () => {
   const contractFactory = await ethers.getContractFactory("SuperUnlockable");
-  const contract = await contractFactory.attach("0xc7Aab1016e5bCb297018b6606DB86D42DE8f2a09");
+  const contract = await contractFactory.attach("0xB361C6e229850caf7A64898648A5E3b1dA85C70a");
   const { lastUpdated, flowRate, deposit, owedDeposit } = await contract.getFlowInfo("0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f", "0x7348943C8d263ea253c0541656c36b88becD77B9", "0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff");
   console.log("lastUpdated:", lastUpdated.toString());
   console.log("flowRate:", flowRate.toString());
@@ -23,7 +23,7 @@ task("getFlowInfo", "Gets Flow Info from contract", async () => {
 
 task("mint", "Mints tokens to address", async () => {
   const contractFactory = await ethers.getContractFactory("SuperUnlockable");
-  const contract = await contractFactory.attach("0xc7Aab1016e5bCb297018b6606DB86D42DE8f2a09");
+  const contract = await contractFactory.attach("0xB361C6e229850caf7A64898648A5E3b1dA85C70a");
   const tx = await contract.mintItem("0x7348943C8d263ea253c0541656c36b88becD77B9", "https://ipfs.io/ipfs/QmNe5s459ngYVinWFBAmAdcQtPNHTeMRwk3xQJXJqwdJcG");
   console.log("tx:", tx);
   await tx.wait();
@@ -43,6 +43,9 @@ module.exports = {
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
       accounts: [process.env.PRIVATE_KEY],
-    }
-  }
+    },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY,
+  },
 };

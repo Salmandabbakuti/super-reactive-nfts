@@ -21,6 +21,9 @@ npx hardhat deploy --network local
 # deploy contract in scripts/deploy.js on specified network
 npx hardhat run scripts/deploy.js --network local
 
+# verify contract on etherscan
+npx hardhat verify --network <DEPLOYED_NETWORK> <DEPLOYED_CONTRACT_ADDRESS> "Constructor arg1" "Constructor arg2"
+
 # unit tests
 npx hardhat test
 
