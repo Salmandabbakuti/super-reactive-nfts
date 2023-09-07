@@ -50,6 +50,7 @@ contract SuperUnlockable is ERC721 {
         );
         uint256 duration = block.timestamp - lastUpdated;
         uint256 totalDeposited = uint256(uint96(flowRate)) * duration;
+        uint256 age = lastUpdated == 0 ? 0 : block.timestamp - lastUpdated;
 
         // Define the metadata attributes
         string memory name = string(
@@ -80,7 +81,7 @@ contract SuperUnlockable is ERC721 {
             flowRate.toString(),
             "},",
             '{"trait_type": "Age", "value": ',
-            duration.toString(),
+            age.toString(),
             "}",
             "]",
             "}"
