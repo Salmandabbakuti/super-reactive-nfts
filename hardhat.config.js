@@ -10,7 +10,7 @@ task("deploy", "Deploys Contract", async () => {
 
 task("getFlowInfo", "Gets Flow Info from contract", async () => {
   const contractFactory = await ethers.getContractFactory("SuperUnlockable");
-  const contract = await contractFactory.attach("0xB361C6e229850caf7A64898648A5E3b1dA85C70a");
+  const contract = await contractFactory.attach("0x6ca95894F9B925f879e8797BcC1490271Cc05CA8");
   const { lastUpdated, flowRate, deposit, owedDeposit } = await contract.getFlowInfo("0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f", "0x7348943C8d263ea253c0541656c36b88becD77B9", "0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff");
   console.log("lastUpdated:", lastUpdated.toString());
   console.log("flowRate:", flowRate.toString());
@@ -23,8 +23,8 @@ task("getFlowInfo", "Gets Flow Info from contract", async () => {
 
 task("mint", "Mints tokens to address", async () => {
   const contractFactory = await ethers.getContractFactory("SuperUnlockable");
-  const contract = await contractFactory.attach("0xB361C6e229850caf7A64898648A5E3b1dA85C70a");
-  const tx = await contract.mintItem("0x7348943C8d263ea253c0541656c36b88becD77B9", "https://ipfs.io/ipfs/QmNe5s459ngYVinWFBAmAdcQtPNHTeMRwk3xQJXJqwdJcG");
+  const contract = await contractFactory.attach("0x6ca95894F9B925f879e8797BcC1490271Cc05CA8");
+  const tx = await contract.mintItem("0x7348943C8d263ea253c0541656c36b88becD77B9");
   console.log("tx:", tx);
   await tx.wait();
   console.log("Minted!");
