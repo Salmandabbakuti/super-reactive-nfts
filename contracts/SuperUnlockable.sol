@@ -93,7 +93,7 @@ contract SuperUnlockable is ERC721 {
 
     /// @notice Get the URI for a token
     /// @param tokenId The ID of the token
-    /// @dev This function will return token the URI in json based on the flow opened by the token owner
+    /// @dev This function will return token the URI in json based on the flow opened by the token owner. overrides ERC721 tokenURI function
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
@@ -122,8 +122,18 @@ contract SuperUnlockable is ERC721 {
         );
         string
             memory description = "Unleash your money-streaming powers with SuperUnlockable collection. These in-game items showcase your ever-evolving powers, speed, and age, all while you continue to stream";
-        string
-            memory imageURI = "https://ipfs.io/ipfs/QmPDYdFGZCEKXgsVmVq4CMH9JoPCYqyBfD2ELEg53LNd5G"; // Customize with the actual image URI
+        bytes memory svgImage = _generateSvgImageForToken(
+            _tokenId,
+            totalDeposited,
+            flowRate,
+            age
+        );
+        string memory imageURI = string(
+            abi.encodePacked(
+                "data:image/svg+xml;base64,",
+                Base64.encode(svgImage)
+            )
+        );
 
         // Create the JSON metadata object
         bytes memory json = abi.encodePacked(
@@ -158,5 +168,53 @@ contract SuperUnlockable is ERC721 {
                     Base64.encode(json)
                 )
             );
+    }
+
+    /// @notice Generate the SVG image for a token based on flow information
+    /// @param _tokenId The ID of the token
+    /// @param _power The total amount of SuperTokens deposited by the token owner
+    /// @param _speed The flow rate of the stream
+    /// @param _age The age of the stream since last update
+    /// @dev This function will return the SVG image for a token based on flow information
+    function _generateSvgImageForToken(
+        uint256 _tokenId,
+        uint256 _power,
+        int96 _speed,
+        uint256 _age
+    ) internal pure returns (bytes memory) {
+        bytes memory svgImage = abi.encodePacked(
+            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 350 350" fill="#161B1D">',
+            '<g xmlns="http://www.w3.org/2000/svg" style="transform-origin:50% 50%;animation:rotate 10s linear infinite">',
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 350">',
+            '<circle cx="50%" cy="50%" r="40%" fill="none" stroke-width="1.5" stroke="#10BB35" mask="url(#cut)"/>',
+            '<image x="25%" y="25%" width="50%" height="50%" xlink:href="https://ipfs.io/ipfs/QmPDYdFGZCEKXgsVmVq4CMH9JoPCYqyBfD2ELEg53LNd5G" />',
+            '<text x="28%" y="65%" text-anchor="start" alignment-baseline="middle" font-size="5" fill="#fff">#',
+            _tokenId.toString(),
+            "</text>",
+            '<text x="28%" y="68%" text-anchor="start" alignment-baseline="middle" font-size="5" fill="#fff">&#9889; ',
+            _power.toString(),
+            "</text>",
+            '<text x="28%" y="71%" text-anchor="start" alignment-baseline="middle" font-size="5" fill="#fff">&#128583; ',
+            _speed.toString(),
+            "</text>",
+            '<text x="28%" y="74%" text-anchor="start" alignment-baseline="middle" font-size="5" fill="#fff">&#9203; ',
+            _age.toString(),
+            "</text>",
+            "<defs>",
+            '<mask id="cut">',
+            '<circle cx="50%" cy="50%" r="40%" stroke-width="1.8" stroke="white"/>',
+            '<line x1="240" y1="280" x2="10" y2="10" stroke="black" transform="rotate(305)" transform-origin="center"/>',
+            '<line x1="240" y1="280" x2="10" y2="10" stroke="black" transform="rotate(315)" transform-origin="center"/>',
+            '<line x1="240" y1="280" x2="10" y2="10" stroke="black" transform="rotate(325)" transform-origin="center"/>',
+            "</mask>",
+            "</defs>",
+            "</svg>",
+            "</g>",
+            '<a xlink:href="https://superunlockable.vercel.app" target="_blank">',
+            '<text x="50%" y="95%" text-anchor="right" alignment-baseline="right" font-size="5" fill="#10BB35">&#10084; superunlockable.vercel.app</text>',
+            "</a>",
+            "</svg>"
+        );
+        return svgImage;
     }
 }
