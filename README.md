@@ -23,6 +23,7 @@ npx hardhat run scripts/deploy.js --network local
 
 # verify contract on etherscan
 npx hardhat verify --network <DEPLOYED_NETWORK> <DEPLOYED_CONTRACT_ADDRESS> "Constructor arg1" "Constructor arg2"
+# npx hardhat verify --network mumbai 0x18Ce4A4D16f1DDFe9dbcf900c49e0316DC47B115 "0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f" "10000000000000000"
 
 # unit tests
 npx hardhat test
