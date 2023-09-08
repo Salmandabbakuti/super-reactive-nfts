@@ -7,6 +7,10 @@ import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contra
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
+/// @title SuperUnlockable - Stream to Unlock In-Game Items with ever-evolving Levels
+/// @author Salman Dev
+/// @notice This contract allows users to mint in-game items with ever-evolving levels while they stream SuperTokens
+/// @dev All function calls are currently implemented without side effects
 contract SuperUnlockable is ERC721 {
     using Strings for uint256;
     using Strings for int96;
@@ -31,18 +35,78 @@ contract SuperUnlockable is ERC721 {
         _;
     }
 
+    /// @notice Set the required deposit for minting
+    /// @param _amount The amount of SuperToken deposit required to mint a new SuperUnlockable item
+    /// @dev Only the owner can call this function
     function setRequiredDeposit(uint256 _amount) public onlyOwner {
         requiredDeposit = _amount;
     }
 
+    /// @notice Withdraw the SuperToken funds from the contract
+    /// @dev Only the owner can call this function
+    function withdrawFunds() public onlyOwner {
+        supportedToken.transfer(
+            msg.sender,
+            supportedToken.balanceOf(address(this))
+        );
+    }
+
+    /// @notice Mints a new SuperUnlockable item
+    /// @param _to The address of the user who will receive the new SuperUnlockable item
+    /// @dev This function will mint a new SuperUnlockable item if the user has deposited enough SuperTokens through a stream into the contract
+    function mintItem(address _to) public {
+        (uint256 lastUpdated, int96 flowRate, , ) = supportedToken.getFlowInfo(
+            msg.sender,
+            address(this)
+        );
+        uint256 totalDeposited = uint256(uint96(flowRate)) *
+            (block.timestamp - lastUpdated);
+        require(
+            totalDeposited >= requiredDeposit,
+            "SuperUnlockable: Not enough deposit"
+        );
+        _safeMint(_to, currentTokenId);
+        currentTokenId++;
+    }
+
+    /// @notice Get the flow information for a user
+    /// @param _token The address of the SuperToken
+    /// @param _sender The address of the user who is sending the stream
+    /// @param _receiver The address of the user who is receiving the stream
+    /// @dev This function will return the flow information for a user
+    function getFlowInfo(
+        ISuperToken _token,
+        address _sender,
+        address _receiver
+    )
+        public
+        view
+        returns (
+            uint256 lastUpdated,
+            int96 flowRate,
+            uint256 deposit,
+            uint256 owedDeposit
+        )
+    {
+        return _token.getFlowInfo(_sender, _receiver);
+    }
+
+    /// @notice Get the URI for a token
+    /// @param tokenId The ID of the token
+    /// @dev This function will return token the URI in json based on the flow opened by the token owner
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
-        return getTokenURI(tokenId);
+        return _getTokenURI(tokenId);
     }
 
-    function getTokenURI(uint256 tokenId) public view returns (string memory) {
-        address tokenOwner = ownerOf(tokenId);
+    /// @notice Prepare and return the URI for a token(internal)
+    /// @param _tokenId The ID of the token
+    /// @dev This function will return token the URI in json based on the flow opened by the token owner
+    function _getTokenURI(
+        uint256 _tokenId
+    ) internal view returns (string memory) {
+        address tokenOwner = ownerOf(_tokenId);
 
         (uint256 lastUpdated, int96 flowRate, , ) = supportedToken.getFlowInfo(
             tokenOwner,
@@ -54,10 +118,10 @@ contract SuperUnlockable is ERC721 {
 
         // Define the metadata attributes
         string memory name = string(
-            abi.encodePacked("SuperUnlockable #", tokenId.toString())
+            abi.encodePacked("FlowMancer #", _tokenId.toString())
         );
         string
-            memory description = "An NFT from the SuperUnlockable collection, showcasing your money streaming powers";
+            memory description = "Unleash your money-streaming powers with SuperUnlockable collection. These in-game items showcase your ever-evolving powers, speed, and age, all while you continue to stream";
         string
             memory imageURI = "https://ipfs.io/ipfs/QmPDYdFGZCEKXgsVmVq4CMH9JoPCYqyBfD2ELEg53LNd5G"; // Customize with the actual image URI
 
@@ -94,37 +158,5 @@ contract SuperUnlockable is ERC721 {
                     Base64.encode(json)
                 )
             );
-    }
-
-    function mintItem(address _to) public {
-        (uint256 lastUpdated, int96 flowRate, , ) = supportedToken.getFlowInfo(
-            msg.sender,
-            address(this)
-        );
-        uint256 totalDeposited = uint256(uint96(flowRate)) *
-            (block.timestamp - lastUpdated);
-        require(
-            totalDeposited >= requiredDeposit,
-            "SuperUnlockable: Not enough deposit"
-        );
-        _safeMint(_to, currentTokenId);
-        currentTokenId++;
-    }
-
-    function getFlowInfo(
-        ISuperToken _token,
-        address _sender,
-        address _receiver
-    )
-        public
-        view
-        returns (
-            uint256 lastUpdated,
-            int96 flowRate,
-            uint256 deposit,
-            uint256 owedDeposit
-        )
-    {
-        return _token.getFlowInfo(_sender, _receiver);
     }
 }
