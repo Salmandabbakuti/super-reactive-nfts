@@ -13,7 +13,10 @@ import {
   Popconfirm,
   Statistic,
   Avatar,
-  Empty
+  Empty,
+  Tabs,
+  Row,
+  Col
 } from "antd";
 import {
   SyncOutlined,
@@ -78,11 +81,9 @@ export default function Home() {
   const getStreamsToContract = async () => {
     setDataLoading(true);
     try {
-      const { lastUpdated, flowRate } = await cfav1ForwarderContract.connect(provider).getFlowInfo(
-        supportedTokenAddress,
-        account,
-        contractAddress
-      );
+      const { lastUpdated, flowRate } = await cfav1ForwarderContract
+        .connect(provider)
+        .getFlowInfo(supportedTokenAddress, account, contractAddress);
       const stream = {
         lastUpdated: lastUpdated.toString(),
         flowRate: flowRate.toString(),
@@ -243,7 +244,8 @@ export default function Home() {
   };
 
   const handleMintItem = async () => {
-    if (!account || !provider) return message.error("Please connect wallet first");
+    if (!account || !provider)
+      return message.error("Please connect wallet first");
     if (!mintToAddress) return message.error("Please enter address to mint to");
     try {
       setLoading(true);
@@ -268,250 +270,299 @@ export default function Home() {
 
   return (
     <div>
-      <div className={styles.cardContainer}>
-        {account ? (
-          <>
-            <Button
-              icon={<WalletOutlined />}
-              type="default"
-              onClick={handleDisconnectWallet}
-            >
-              {account.slice(0, 8) + "..." + account.slice(-5)}
-            </Button>
-            {stream?.flowRate !== "0" ? (
-              <Card
-                title="Your Stream to contract"
-                bordered
-                hoverable
-                loading={dataLoading}
-                style={{ width: 450 }}
-                actions={[
-                  <p>
-                    Last Updated:{" "}
-                    {dayjs(stream?.lastUpdated * 1000).fromNow()}
-                  </p>
-                ]}
-                extra={
-                  <Space>
-                    <Button
-                      title="Refresh"
-                      type="primary"
-                      shape="circle"
-                      icon={<SyncOutlined spin={dataLoading} />}
-                      onClick={getStreamsToContract}
-                    />
-                    <Popconfirm
-                      title={
-                        <>
-                          <h3>Enter new flow rate</h3>
-                          <Input
-                            type="number"
-                            placeholder="Flowrate in no. of tokens"
-                            addonAfter="/month"
-                            value={updatedFlowRateInput}
-                            onChange={(e) =>
-                              setUpdatedFlowRateInput(e.target.value)
-                            }
-                          />
-                          <p>
-                            *You are Streaming{" "}
-                            <b>{updatedFlowRateInput || 0} fDAIx/month</b> to
-                            contract
-                          </p>
-                        </>
-                      }
-                      onConfirm={() =>
-                        handleUpdateStreamToContract(updatedFlowRateInput)
-                      }
-                    >
-                      <Button
-                        title="Update"
-                        icon={<EditOutlined />}
-                        type="primary"
-                        shape="circle"
-                      />
-                    </Popconfirm>
-                    <Popconfirm
-                      title="Are you sure to delete?"
-                      onConfirm={handleDeleteStream}
-                    >
-                      <Button
-                        title="Delete"
-                        icon={<DeleteOutlined />}
-                        type="primary"
-                        shape="circle"
-                        danger
-                      />
-                    </Popconfirm>
-                  </Space>
-                }
-              >
-                <h3 style={{ textAlign: "center" }}>
-                  {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
-                  fDAIx/mo
-                </h3>
-                <Space>
-                  <Card style={{ float: "left" }}>
-                    <Statistic
-                      title="Sender (You)"
-                      value={
-                        stream?.sender?.slice(0, 5) +
-                        "..." +
-                        stream?.sender?.slice(-5)
-                      }
-                      precision={2}
-                      valueStyle={{ color: "#3f8600", fontSize: "1rem" }}
-                    // prefix={<ArrowUpOutlined />}
-                    />
-                  </Card>
-                  <Image src="/flow_animation.gif" width={75} height={70} />
-                  <Card style={{ float: "right" }}>
-                    <Statistic
-                      title="Receiver (Contract)"
-                      value={
-                        stream?.receiver?.slice(0, 5) +
-                        "..." +
-                        stream?.receiver?.slice(-5)
-                      }
-                      precision={2}
-                      valueStyle={{ color: "#cf1322", fontSize: "1rem" }}
-                    // prefix={<ArrowDownOutlined />}
-                    // suffix="%"
-                    />
-                  </Card>
-                </Space>
-              </Card>
-            ) : (
-              <Card
-                title="Your Stream to contract"
-                // style={{ width: 500 }}
-                extra={
-                  <Space>
-                    <Button
-                      title="Refresh"
-                      type="primary"
-                      shape="circle"
-                      icon={<SyncOutlined spin={dataLoading} />}
-                      onClick={getStreamsToContract}
-                    />
-                    <Popconfirm
-                      title={
-                        <>
-                          <h3>Enter flow rate</h3>
-                          <Input
-                            type="number"
-                            placeholder="Flowrate in no. of tokens"
-                            addonAfter="/month"
-                            value={flowRateInput}
-                            onChange={(e) => setFlowRateInput(e.target.value)}
-                          />
-                          <p>
-                            *You are Streaming{" "}
-                            <b>{flowRateInput || 0} fDAIx/month</b> to contract
-                          </p>
-                        </>
-                      }
-                      onConfirm={() =>
-                        handleCreateStreamToContract(flowRateInput)
-                      }
-                    >
-                      <Button
-                        type="primary"
-                        shape="circle"
-                        title="Create new stream"
-                        icon={<PlusCircleOutlined />}
-                      />
-                    </Popconfirm>
-                  </Space>
-                }
-              >
-                <p>
-                  No stream found. Open a stream to contract and unlock your
-                  super powers
-                </p>
-              </Card>
-            )}
-          </>
-        ) : (
+      {account ? (
+        <>
           <Button
-            type="primary"
-            icon={<WalletFilled />}
-            loading={loading.connect}
-            onClick={handleConnectWallet}
+            icon={<WalletOutlined />}
+            type="default"
+            onClick={handleDisconnectWallet}
           >
-            Connect Wallet
+            {account.slice(0, 8) + "..." + account.slice(-5)}
           </Button>
-        )}
-      </div>
-      <div>
-        <h1 style={{ textAlign: "center" }}>Your Items</h1>
-        <Card
-          className={styles.cardContainer}
-          hoverable
-          bordered
-          title="Mint new item"
-        // style={{ width: 300 }}
+          <Tabs
+            type="line"
+            animated
+            style={{ marginBottom: 20 }}
+            defaultActiveKey="1"
+            items={[
+              {
+                key: "1",
+                label: "Account",
+                children: (
+                  <div className={styles.cardContainer}>
+                    {stream?.flowRate !== "0" ? (
+                      <Card
+                        title="Your Stream to contract"
+                        bordered
+                        hoverable
+                        loading={dataLoading}
+                        style={{ width: 450 }}
+                        actions={[
+                          <p>
+                            Last Updated:{" "}
+                            {dayjs(stream?.lastUpdated * 1000).fromNow()}
+                          </p>
+                        ]}
+                        extra={
+                          <Space>
+                            <Button
+                              title="Refresh"
+                              type="primary"
+                              shape="circle"
+                              icon={<SyncOutlined spin={dataLoading} />}
+                              onClick={getStreamsToContract}
+                            />
+                            <Popconfirm
+                              title={
+                                <>
+                                  <h3>Enter new flow rate</h3>
+                                  <Input
+                                    type="number"
+                                    placeholder="Flowrate in no. of tokens"
+                                    addonAfter="/month"
+                                    value={updatedFlowRateInput}
+                                    onChange={(e) =>
+                                      setUpdatedFlowRateInput(e.target.value)
+                                    }
+                                  />
+                                  <p>
+                                    *You are Streaming{" "}
+                                    <b>
+                                      {updatedFlowRateInput || 0} fDAIx/month
+                                    </b>{" "}
+                                    to contract
+                                  </p>
+                                </>
+                              }
+                              onConfirm={() =>
+                                handleUpdateStreamToContract(
+                                  updatedFlowRateInput
+                                )
+                              }
+                            >
+                              <Button
+                                title="Update"
+                                icon={<EditOutlined />}
+                                type="primary"
+                                shape="circle"
+                              />
+                            </Popconfirm>
+                            <Popconfirm
+                              title="Are you sure to delete?"
+                              onConfirm={handleDeleteStream}
+                            >
+                              <Button
+                                title="Delete"
+                                icon={<DeleteOutlined />}
+                                type="primary"
+                                shape="circle"
+                                danger
+                              />
+                            </Popconfirm>
+                          </Space>
+                        }
+                      >
+                        <h3 style={{ textAlign: "center" }}>
+                          {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
+                          fDAIx/mo
+                        </h3>
+                        <Space>
+                          <Card style={{ float: "left" }}>
+                            <Statistic
+                              title="Sender (You)"
+                              value={
+                                stream?.sender?.slice(0, 5) +
+                                "..." +
+                                stream?.sender?.slice(-5)
+                              }
+                              precision={2}
+                              valueStyle={{
+                                color: "#3f8600",
+                                fontSize: "1rem"
+                              }}
+                            // prefix={<ArrowUpOutlined />}
+                            />
+                          </Card>
+                          <Image
+                            src="/flow_animation.gif"
+                            width={75}
+                            height={70}
+                          />
+                          <Card style={{ float: "right" }}>
+                            <Statistic
+                              title="Receiver (Contract)"
+                              value={
+                                stream?.receiver?.slice(0, 5) +
+                                "..." +
+                                stream?.receiver?.slice(-5)
+                              }
+                              precision={2}
+                              valueStyle={{
+                                color: "#cf1322",
+                                fontSize: "1rem"
+                              }}
+                            // prefix={<ArrowDownOutlined />}
+                            // suffix="%"
+                            />
+                          </Card>
+                        </Space>
+                      </Card>
+                    ) : (
+                      <Card
+                        title="Your Stream to contract"
+                        // style={{ width: 500 }}
+                        extra={
+                          <Space>
+                            <Button
+                              title="Refresh"
+                              type="primary"
+                              shape="circle"
+                              icon={<SyncOutlined spin={dataLoading} />}
+                              onClick={getStreamsToContract}
+                            />
+                            <Popconfirm
+                              title={
+                                <>
+                                  <h3>Enter flow rate</h3>
+                                  <Input
+                                    type="number"
+                                    placeholder="Flowrate in no. of tokens"
+                                    addonAfter="/month"
+                                    value={flowRateInput}
+                                    onChange={(e) =>
+                                      setFlowRateInput(e.target.value)
+                                    }
+                                  />
+                                  <p>
+                                    *You are Streaming{" "}
+                                    <b>{flowRateInput || 0} fDAIx/month</b> to
+                                    contract
+                                  </p>
+                                </>
+                              }
+                              onConfirm={() =>
+                                handleCreateStreamToContract(flowRateInput)
+                              }
+                            >
+                              <Button
+                                type="primary"
+                                shape="circle"
+                                title="Create new stream"
+                                icon={<PlusCircleOutlined />}
+                              />
+                            </Popconfirm>
+                          </Space>
+                        }
+                      >
+                        <p>
+                          No stream found. Open a stream to contract and unlock
+                          your super powers
+                        </p>
+                      </Card>
+                    )}
+                  </div>
+                )
+              },
+              {
+                key: "2",
+                label: "Items",
+                children: (
+                  <div>
+                    <h1 style={{ textAlign: "center" }}>Your Items</h1>
+                    <Card
+                      className={styles.cardContainer}
+                      hoverable
+                      bordered
+                      title="Mint new item"
+                      style={{ width: 300 }}
+                    >
+                      <p>Mint a new item and unlock your super powers</p>
+                      <Space.Compact>
+                        <Input
+                          type="text"
+                          value={mintToAddress}
+                          placeholder="Mint to address"
+                          onChange={(e) => setMintToAddress(e.target.value)}
+                        />
+                        <Button
+                          type="primary"
+                          shape="circle"
+                          title="Mint new item"
+                          icon={<ArrowRightOutlined />}
+                          onClick={handleMintItem}
+                        />
+                      </Space.Compact>
+                    </Card>
+                    <Row gutter={[16, 18]}>
+                      {
+                        items?.length > 0 ? items.map((item, index) => {
+                          const { id, owner, uri, createdAt } = item;
+                          console.log("uri: ", uri);
+                          const base64Uri = uri.split(",")[1];
+                          console.log("base64Uri: ", base64Uri);
+                          const metadata = JSON.parse(atob(base64Uri));
+                          console.log("metadata: ", metadata);
+                          return (
+                            <Col key={index} xs={24} sm={12} md={8} lg={6}>
+                              <Card
+                                hoverable
+                                style={{
+                                  cursor: "pointer",
+                                  width: 300,
+                                  marginTop: 14,
+                                  borderRadius: 10,
+                                  border: "1px solid #d9d9d9"
+                                }}
+                                loading={dataLoading}
+                                title={
+                                  <Card.Meta
+                                    avatar={
+                                      <Avatar
+                                        size="large"
+                                        src={`https://api.dicebear.com/5.x/open-peeps/svg?seed=${owner}`}
+                                      />
+                                    }
+                                    title={`${owner?.slice(
+                                      0,
+                                      10
+                                    )}...${owner?.slice(-6)}`}
+                                  />
+                                }
+                                actions={[
+                                  <p>{dayjs(createdAt * 1000).fromNow()}</p>
+                                ]}
+                              >
+                                <Card.Meta description={metadata?.name} />
+                                {metadata?.image && (
+                                  <img
+                                    width={260}
+                                    style={{ marginTop: 10, borderRadius: 10 }}
+                                    alt="post-media"
+                                    src={metadata?.image}
+                                  />
+                                )}
+                              </Card>
+                            </Col>
+                          );
+                        }) : <Empty description="No items found" />
+                      }
+                    </Row>
+                  </div>
+                )
+              }
+            ]}
+          />
+        </>
+      ) : (
+        <Button
+          type="primary"
+          icon={<WalletFilled />}
+          loading={loading.connect}
+          onClick={handleConnectWallet}
         >
-          <p>
-            Mint a new item and unlock your super powers
-          </p>
-          <Space.Compact>
-            <Input
-              type="text"
-              value={mintToAddress}
-              placeholder="Mint to address"
-              onChange={(e) => setMintToAddress(e.target.value)}
-            />
-            <Button
-              type="primary"
-              shape="circle"
-              title="Mint new item"
-              icon={<ArrowRightOutlined />}
-              onClick={handleMintItem}
-            />
-          </Space.Compact>
-        </Card>
-
-        {
-          items?.length > 0 ? (
-            <div className={styles.cardContainer}>
-              {items.map((item) => (
-
-                <Card
-                  key={item.id}
-                  hoverable
-                  style={{ width: 300 }}
-                  cover={
-                    <Image
-                      src={item.uri}
-                      alt={item.uri}
-                      width={300}
-                      height={300}
-                    />
-                  }
-                // actions={[
-                //   <Button
-                //     type="primary"
-                //     icon={<SettingOutlined />}
-                //     onClick={() => handleMintItem(item.id)}
-                //   >
-                //     Mint
-                //   </Button>
-                // ]}
-                >
-                  <Card.Meta
-                    avatar={<Avatar src="/item.png" />}
-                    title={item.id}
-                    description={item.owner}
-                  />
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Empty description="No items found" />
-          )
-        }
-      </div>
+          Connect Wallet
+        </Button>
+      )}
     </div>
   );
 }
