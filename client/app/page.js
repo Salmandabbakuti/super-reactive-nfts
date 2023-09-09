@@ -44,7 +44,7 @@ const supportedTokenAddress =
 
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
-  const [stream, setStream] = useState();
+  const [stream, setStream] = useState(null);
   const [account, setAccount] = useState("");
   const [provider, setProvider] = useState(null);
   const [updatedFlowRateInput, setUpdatedFlowRateInput] = useState(0);
@@ -53,29 +53,26 @@ export default function Home() {
 
   const getStreamsToContract = async () => {
     setDataLoading(true);
-    client
-      .request(GET_STREAMS, {
-        skip: 0,
-        first: 1,
-        orderBy: "updatedAtTimestamp",
-        orderDirection: "desc",
-        where: {
-          sender: account.toLowerCase(),
-          receiver: contractAddress.toLowerCase(),
-          token: supportedTokenAddress.toLowerCase(),
-          currentFlowRate_gt: 0
-        }
-      })
-      .then((data) => {
-        console.log("User Stream to contract: ", data.streams[0]);
-        setStream(data.streams[0]);
-        setDataLoading(false);
-      })
-      .catch((err) => {
-        message.error("Something went wrong!");
-        console.error("failed to get user streams to contract: ", err);
-        setDataLoading(false);
-      });
+    try {
+      const { lastUpdated, flowRate } = await cfav1ForwarderContract.connect(provider).getFlowInfo(
+        supportedTokenAddress,
+        account,
+        contractAddress
+      );
+      const stream = {
+        lastUpdated: lastUpdated.toString(),
+        flowRate: flowRate.toString(),
+        sender: account,
+        receiver: contractAddress
+      };
+      console.log("stream: ", stream);
+      setStream(stream);
+      setDataLoading(false);
+    } catch (err) {
+      message.error("Failed to get streams to contract");
+      setDataLoading(false);
+      console.error("failed to get streams to contract: ", err);
+    }
   };
   const handleDisconnectWallet = async () => {
     setAccount(null);
@@ -239,7 +236,7 @@ export default function Home() {
             >
               {account.slice(0, 8) + "..." + account.slice(-5)}
             </Button>
-            {stream ? (
+            {stream?.flowRate !== "0" ? (
               <Card
                 title="Your Stream to contract"
                 bordered
@@ -248,12 +245,8 @@ export default function Home() {
                 style={{ width: 450 }}
                 actions={[
                   <p>
-                    Created At:{" "}
-                    {dayjs(stream?.createdAtTimestamp * 1000).fromNow()}
-                  </p>,
-                  <p>
-                    Updated At:{" "}
-                    {dayjs(stream?.updatedAtTimestamp * 1000).fromNow()}
+                    Last Updated:{" "}
+                    {dayjs(stream?.lastUpdated * 1000).fromNow()}
                   </p>
                 ]}
                 extra={
@@ -312,7 +305,7 @@ export default function Home() {
                 }
               >
                 <h3 style={{ textAlign: "center" }}>
-                  {calculateFlowRateInTokenPerMonth(stream?.currentFlowRate)}{" "}
+                  {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
                   fDAIx/mo
                 </h3>
                 <Space>
@@ -320,23 +313,23 @@ export default function Home() {
                     <Statistic
                       title="Sender (You)"
                       value={
-                        stream?.sender?.id.slice(0, 5) +
+                        stream?.sender?.slice(0, 5) +
                         "..." +
-                        stream?.sender?.id.slice(-5)
+                        stream?.sender?.slice(-5)
                       }
                       precision={2}
                       valueStyle={{ color: "#3f8600", fontSize: "1rem" }}
                     // prefix={<ArrowUpOutlined />}
                     />
                   </Card>
-                  <Image src="/flow_animation.gif" width={80} height={70} />
+                  <Image src="/flow_animation.gif" width={75} height={70} />
                   <Card style={{ float: "right" }}>
                     <Statistic
                       title="Receiver (Contract)"
                       value={
-                        stream?.receiver?.id.slice(0, 8) +
+                        stream?.receiver?.slice(0, 5) +
                         "..." +
-                        stream?.receiver?.id.slice(-5)
+                        stream?.receiver?.slice(-5)
                       }
                       precision={2}
                       valueStyle={{ color: "#cf1322", fontSize: "1rem" }}

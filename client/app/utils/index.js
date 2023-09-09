@@ -14,7 +14,8 @@ const contractABI = [
 const cfav1ForwarderABI = [
   "function createFlow(address token, address sender, address receiver, int96 flowrate, bytes userData) returns (bool)",
   "function updateFlow(address token, address sender, address receiver, int96 flowrate, bytes userData) returns (bool)",
-  "function deleteFlow(address token, address sender, address receiver, bytes userData) returns (bool)"
+  "function deleteFlow(address token, address sender, address receiver, bytes userData) returns (bool)",
+  "function getFlowInfo(address token, address sender, address receiver) view returns (uint256 lastUpdated, int96 flowRate, uint256 deposit, uint256 owedDeposit)"
 ];
 const cfav1ForwarderContractAddress = process.env.NEXT_PUBLIC_CFAV1_FORWARDER_ADDRESS || "0xcfA132E353cB4E398080B9700609bb008eceB125";
 const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x18Ce4A4D16f1DDFe9dbcf900c49e0316DC47B115";
