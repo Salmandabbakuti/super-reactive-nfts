@@ -1,12 +1,9 @@
 "use client";
-import Link from "next/link";
 import { useState, useEffect } from "react";
-import { formatUnits } from "@ethersproject/units";
-import { Contract } from "@ethersproject/contracts";
 import { Web3Provider } from "@ethersproject/providers";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Button, Input, message, Space, Table, Card, Popconfirm } from "antd";
+import { Button, Input, message, Space, Card, Popconfirm } from "antd";
 import {
   SyncOutlined,
   EditOutlined,
@@ -17,12 +14,10 @@ import {
 } from "@ant-design/icons";
 import { graphqlClient as client } from "./utils";
 import { GET_STREAMS } from "./utils/graphqlQueries";
-import { calculateFlowRateInTokenPerMonth, calculateFlowRateInWeiPerSecond } from "./utils";
+import { calculateFlowRateInTokenPerMonth, calculateFlowRateInWeiPerSecond, cfav1ForwarderContract, contract } from "./utils";
 import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
-const explorerUrl =
-  process.env.NEXT_PUBLIC_EXPLORER_URL || "https://polygonscan.com";
 const contractAddress =
   process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
   "0x18Ce4A4D16f1DDFe9dbcf900c49e0316DC47B115";
@@ -30,22 +25,11 @@ const supportedTokenAddress =
   process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
   "0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f";
 
-const contractABI = [];
-const cfav1ForwarderABI = [
-  "function createFlow(address token, address sender, address receiver, int96 flowrate, bytes userData) returns (bool)",
-  "function updateFlow(address token, address sender, address receiver, int96 flowrate, bytes userData) returns (bool)",
-  "function deleteFlow(address token, address sender, address receiver, bytes userData) returns (bool)"
-];
-const cfav1ForwarderContractAddress = "0xcfA132E353cB4E398080B9700609bb008eceB125";
-
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
-  const [tokenTransfers, setTokenTransfers] = useState([]);
   const [stream, setStream] = useState();
   const [account, setAccount] = useState("");
-  const [contract, setContract] = useState(null);
-  const [cfav1ForwarderContract, setCfav1ForwarderContract] = useState(null);
+  const [provider, setProvider] = useState(null);
   const [updatedFlowRateInput, setUpdatedFlowRateInput] = useState(0);
   const [loading, setLoading] = useState({ connect: false });
   const [flowRateInput, setFlowRateInput] = useState(0);
@@ -78,8 +62,7 @@ export default function Home() {
   };
   const handleDisconnectWallet = async () => {
     setAccount(null);
-    setContract(null);
-    setCfav1ForwarderContract(null);
+    setProvider(null);
     message.success("Wallet disconnected");
   };
 
@@ -134,19 +117,8 @@ export default function Home() {
       console.log("Using account: ", account1);
       console.log("current chainId:", chainId);
       const provider = new Web3Provider(window.ethereum);
-      const contract = new Contract(
-        contractAddress,
-        contractABI,
-        provider.getSigner()
-      );
-      const cfav1ForwarderContract = new Contract(
-        cfav1ForwarderContractAddress,
-        cfav1ForwarderABI,
-        provider.getSigner()
-      );
       setAccount(account1);
-      setContract(contract);
-      setCfav1ForwarderContract(cfav1ForwarderContract);
+      setProvider(provider);
       message.success("Wallet connected");
     } catch (err) {
       console.log("err connecting wallet", err);
@@ -157,13 +129,14 @@ export default function Home() {
   };
 
   const handleCreateStreamToContract = async (flowRate) => {
-    if (!account || !cfav1ForwarderContract) return message.error("Please connect wallet first");
+    if (!account || !provider) return message.error("Please connect wallet first");
     if (!flowRate) return message.error("Please enter flow rate");
     try {
       setLoading(true);
       const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
       console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
-      const tx = await cfav1ForwarderContract.createFlow(
+      const signer = provider.getSigner();
+      const tx = await cfav1ForwarderContract.connect(signer).createFlow(
         supportedTokenAddress,
         account,
         contractAddress,
@@ -187,7 +160,8 @@ export default function Home() {
       setLoading(true);
       const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
       console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
-      const tx = await cfav1ForwarderContract
+      const signer = provider.getSigner();
+      const tx = await cfav1ForwarderContract.connect(signer)
         .updateFlow(
           supportedTokenAddress,
           account,
@@ -210,7 +184,8 @@ export default function Home() {
     if (!stream) return message.error("No stream found open to contract");
     try {
       setLoading(true);
-      const tx = await cfav1ForwarderContract
+      const signer = provider.getSigner();
+      const tx = await cfav1ForwarderContract.connect(signer)
         .deleteFlow(supportedTokenAddress, account, contractAddress, "0x");
       await tx.wait();
       message.success("Stream deleted successfully");
@@ -301,9 +276,9 @@ export default function Home() {
                 }
               >
                 <p>Stream ID: {stream?.id}</p>
-                <p>Sender: {stream?.sender?.id}</p>
-                <p>Receiver: {stream?.receiver?.id}</p>
-                <p>Token: {stream?.token?.id}</p>
+                <p>Sender: {stream?.sender?.id} (You)</p>
+                <p>Receiver: {stream?.receiver?.id} (Contract)</p>
+                <p>Token: {stream?.token?.id} (fDAIx)</p>
                 <p>Flow Rate: {calculateFlowRateInTokenPerMonth(stream?.currentFlowRate)}/mo</p>
                 <p>
                   Streamed Until:{" "}
@@ -368,7 +343,7 @@ export default function Home() {
           <Button
             type="primary"
             icon={<WalletFilled />}
-            loading={loading}
+            loading={loading.connect}
             onClick={handleConnectWallet}
           >
             Connect Wallet
