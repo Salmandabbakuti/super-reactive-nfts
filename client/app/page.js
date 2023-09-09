@@ -1,20 +1,37 @@
 "use client";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Button, Input, message, Space, Card, Popconfirm } from "antd";
+import {
+  Button,
+  Input,
+  message,
+  Space,
+  Card,
+  Popconfirm,
+  Statistic,
+  Avatar
+} from "antd";
 import {
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
   PlusCircleOutlined,
   WalletOutlined,
-  WalletFilled
+  WalletFilled,
+  ArrowRightOutlined,
+  SettingOutlined
 } from "@ant-design/icons";
 import { graphqlClient as client } from "./utils";
 import { GET_STREAMS } from "./utils/graphqlQueries";
-import { calculateFlowRateInTokenPerMonth, calculateFlowRateInWeiPerSecond, cfav1ForwarderContract, contract } from "./utils";
+import {
+  calculateFlowRateInTokenPerMonth,
+  calculateFlowRateInWeiPerSecond,
+  cfav1ForwarderContract,
+  contract
+} from "./utils";
 import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
@@ -129,20 +146,23 @@ export default function Home() {
   };
 
   const handleCreateStreamToContract = async (flowRate) => {
-    if (!account || !provider) return message.error("Please connect wallet first");
+    if (!account || !provider)
+      return message.error("Please connect wallet first");
     if (!flowRate) return message.error("Please enter flow rate");
     try {
       setLoading(true);
       const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
       console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
       const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract.connect(signer).createFlow(
-        supportedTokenAddress,
-        account,
-        contractAddress,
-        flowRateInWeiPerSecond,
-        "0x"
-      );
+      const tx = await cfav1ForwarderContract
+        .connect(signer)
+        .createFlow(
+          supportedTokenAddress,
+          account,
+          contractAddress,
+          flowRateInWeiPerSecond,
+          "0x"
+        );
       await tx.wait();
       message.success("Stream opened to contract successfully");
       setLoading(false);
@@ -154,14 +174,16 @@ export default function Home() {
   };
 
   const handleUpdateStreamToContract = async (flowRate) => {
-    if (!account || !cfav1ForwarderContract) return message.error("Please connect wallet first");
+    if (!account || !cfav1ForwarderContract)
+      return message.error("Please connect wallet first");
     if (!flowRate) return message.error("Please enter new flow rate");
     try {
       setLoading(true);
       const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
       console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
       const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract.connect(signer)
+      const tx = await cfav1ForwarderContract
+        .connect(signer)
         .updateFlow(
           supportedTokenAddress,
           account,
@@ -180,12 +202,14 @@ export default function Home() {
   };
 
   const handleDeleteStream = async () => {
-    if (!account || !cfav1ForwarderContract) return message.error("Please connect wallet first");
+    if (!account || !cfav1ForwarderContract)
+      return message.error("Please connect wallet first");
     if (!stream) return message.error("No stream found open to contract");
     try {
       setLoading(true);
       const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract.connect(signer)
+      const tx = await cfav1ForwarderContract
+        .connect(signer)
         .deleteFlow(supportedTokenAddress, account, contractAddress, "0x");
       await tx.wait();
       message.success("Stream deleted successfully");
@@ -204,7 +228,7 @@ export default function Home() {
   }, [account]);
 
   return (
-    <div >
+    <div>
       <div className={styles.cardContainer}>
         {account ? (
           <>
@@ -219,8 +243,19 @@ export default function Home() {
               <Card
                 title="Your Stream to contract"
                 bordered
+                hoverable
                 loading={dataLoading}
-                style={{ width: 500 }}
+                // style={{ width: 500 }}
+                actions={[
+                  <p>
+                    Created At:{" "}
+                    {dayjs(stream?.createdAtTimestamp * 1000).fromNow()}
+                  </p>,
+                  <p>
+                    Updated At:{" "}
+                    {dayjs(stream?.updatedAtTimestamp * 1000).fromNow()}
+                  </p>
+                ]}
                 extra={
                   <Space>
                     <Button
@@ -244,8 +279,9 @@ export default function Home() {
                             }
                           />
                           <p>
-                            *You are Streaming <b>{updatedFlowRateInput || 0} fDAIx/month</b>{" "}
-                            to contract
+                            *You are Streaming{" "}
+                            <b>{updatedFlowRateInput || 0} fDAIx/month</b> to
+                            contract
                           </p>
                         </>
                       }
@@ -275,26 +311,45 @@ export default function Home() {
                   </Space>
                 }
               >
-                <p>Stream ID: {stream?.id}</p>
-                <p>Sender: {stream?.sender?.id} (You)</p>
-                <p>Receiver: {stream?.receiver?.id} (Contract)</p>
-                <p>Token: {stream?.token?.id} (fDAIx)</p>
-                <p>Flow Rate: {calculateFlowRateInTokenPerMonth(stream?.currentFlowRate)}/mo</p>
-                <p>
-                  Streamed Until:{" "}
-                  {dayjs(stream?.streamedUntilUpdatedAt * 1000).fromNow()}
-                </p>
-                <p>
-                  Created At: {dayjs(stream?.createdAtTimestamp * 1000).fromNow()}
-                </p>
-                <p>
-                  Updated At: {dayjs(stream?.updatedAtTimestamp * 1000).fromNow()}
-                </p>
+                <h3 style={{ textAlign: "center" }}>
+                  {calculateFlowRateInTokenPerMonth(stream?.currentFlowRate)}{" "}
+                  fDAIx/mo
+                </h3>
+                <Space>
+                  <Card style={{ float: "left" }}>
+                    <Statistic
+                      title="Sender (You)"
+                      value={
+                        stream?.sender?.id.slice(0, 5) +
+                        "..." +
+                        stream?.sender?.id.slice(-5)
+                      }
+                      precision={2}
+                      valueStyle={{ color: "#3f8600", fontSize: "1rem" }}
+                    // prefix={<ArrowUpOutlined />}
+                    />
+                  </Card>
+                  <Image src="/flow_animation.gif" width={80} height={70} />
+                  <Card style={{ float: "right" }}>
+                    <Statistic
+                      title="Receiver (Contract)"
+                      value={
+                        stream?.receiver?.id.slice(0, 8) +
+                        "..." +
+                        stream?.receiver?.id.slice(-5)
+                      }
+                      precision={2}
+                      valueStyle={{ color: "#cf1322", fontSize: "1rem" }}
+                    // prefix={<ArrowDownOutlined />}
+                    // suffix="%"
+                    />
+                  </Card>
+                </Space>
               </Card>
             ) : (
               <Card
                 title="Your Stream to contract"
-                style={{ width: 500 }}
+                // style={{ width: 500 }}
                 extra={
                   <Space>
                     <Button
@@ -316,8 +371,8 @@ export default function Home() {
                             onChange={(e) => setFlowRateInput(e.target.value)}
                           />
                           <p>
-                            *You are Streaming <b>{flowRateInput || 0} fDAIx/month</b>{" "}
-                            to contract
+                            *You are Streaming{" "}
+                            <b>{flowRateInput || 0} fDAIx/month</b> to contract
                           </p>
                         </>
                       }
@@ -335,7 +390,10 @@ export default function Home() {
                   </Space>
                 }
               >
-                <p>No stream found. Open a stream to contract and unlock your super powers</p>
+                <p>
+                  No stream found. Open a stream to contract and unlock your
+                  super powers
+                </p>
               </Card>
             )}
           </>
