@@ -7,6 +7,11 @@ bin-release/
 # Other files and folders
 .settings/
 node_modules/
+.next/
+out/
+build/
+dist/
+generated/
 package-lock.json
 yarn.lock
 
