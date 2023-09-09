@@ -1,16 +1,27 @@
 {
-  "name": "hardhat-boilerplate",
+  "name": "super-unlockable",
   "version": "1.0.0",
-  "description": "hardhat and ethersjs minimal boilerplate for Dapp development",
+  "description": "Super Unlockable NFTs Powered by Superfluid",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat test",
-    "compile": "npx hardhat compile",
-    "deploy": "npx hardhat deploy"
+    "hardhat:test": "npx hardhat test",
+    "hardhat:compile": "npx hardhat compile",
+    "hardhat:deploy": "npx hardhat deploy",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ salmandabbakuti/super-unlockable",
+    "create-local": "graph create --node http://localhost:8020/ salmandabbakuti/super-unlockable",
+    "remove-local": "graph remove --node http://localhost:8020/ salmandabbakuti/super-unlockable",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 salmandabbakuti/super-unlockable",
+    "test": "graph test"
   },
   "keywords": [],
   "author": "Salman Dabbakuti",
   "license": "ISC",
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.57.0",
+    "@graphprotocol/graph-ts": "0.30.0"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",
     "@superfluid-finance/ethereum-contracts": "^1.8.1",

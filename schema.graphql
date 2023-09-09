@@ -1,0 +1,6 @@
+type Token @entity(immutable: true) {
+  id: ID! # token id
+  owner: Bytes! # address
+  uri: String! # string
+  createdAt: BigInt! # uint256
+}

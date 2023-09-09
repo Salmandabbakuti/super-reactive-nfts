@@ -245,7 +245,7 @@ export default function Home() {
                 bordered
                 hoverable
                 loading={dataLoading}
-                // style={{ width: 500 }}
+                style={{ width: 450 }}
                 actions={[
                   <p>
                     Created At:{" "}
