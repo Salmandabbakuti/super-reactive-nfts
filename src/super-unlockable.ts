@@ -1,8 +1,8 @@
 import {
   Transfer as TransferEvent,
   SuperUnlockable as SuperUnlockableContract
-} from "../super-unlockable/generated/SuperUnlockable/SuperUnlockable";
-import { Token } from "../super-unlockable/generated/schema";
+} from "../generated/SuperUnlockable/SuperUnlockable";
+import { Token } from "../generated/schema";
 
 export function handleTransfer(event: TransferEvent): void {
   // check if it is mint or burn or transfer
