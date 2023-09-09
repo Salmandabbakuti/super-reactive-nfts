@@ -172,7 +172,6 @@ export default function Home() {
       return message.error("Please connect wallet first");
     if (!flowRate) return message.error("Please enter flow rate");
     try {
-      setLoading(true);
       const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
       console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
       const signer = provider.getSigner();
@@ -187,9 +186,7 @@ export default function Home() {
         );
       await tx.wait();
       message.success("Stream opened to contract successfully");
-      setLoading(false);
     } catch (err) {
-      setLoading(false);
       message.error("Failed to open stream to contract");
       console.error("failed to open stream to contract: ", err);
     }
@@ -200,7 +197,6 @@ export default function Home() {
       return message.error("Please connect wallet first");
     if (!flowRate) return message.error("Please enter new flow rate");
     try {
-      setLoading(true);
       const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
       console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
       const signer = provider.getSigner();
@@ -215,9 +211,7 @@ export default function Home() {
         );
       await tx.wait();
       message.success("Stream updated successfully");
-      setLoading(false);
     } catch (err) {
-      setLoading(false);
       message.error("Failed to update stream");
       console.error("failed to update stream: ", err);
     }
@@ -228,16 +222,13 @@ export default function Home() {
       return message.error("Please connect wallet first");
     if (!stream) return message.error("No stream found open to contract");
     try {
-      setLoading(true);
       const signer = provider.getSigner();
       const tx = await cfav1ForwarderContract
         .connect(signer)
         .deleteFlow(supportedTokenAddress, account, contractAddress, "0x");
       await tx.wait();
       message.success("Stream deleted successfully");
-      setLoading(false);
     } catch (err) {
-      setLoading(false);
       message.error("Failed to delete stream");
       console.error("failed to delete stream: ", err);
     }
@@ -248,14 +239,14 @@ export default function Home() {
       return message.error("Please connect wallet first");
     if (!mintToAddress) return message.error("Please enter address to mint to");
     try {
-      setLoading(true);
+      setLoading({ mintItem: true });
       const signer = provider.getSigner();
       const tx = await contract.connect(signer).mintItem(mintToAddress);
       await tx.wait();
       message.success("Item minted successfully");
-      setLoading(false);
+      setLoading({ mintItem: false });
     } catch (err) {
-      setLoading(false);
+      setLoading({ mintItem: false });
       message.error("Failed to mint item");
       console.error("failed to mint item: ", err);
     }
@@ -481,13 +472,13 @@ export default function Home() {
                         <Input
                           type="text"
                           value={mintToAddress}
-                          placeholder="Mint to address"
+                          placeholder="Address to mint to"
                           onChange={(e) => setMintToAddress(e.target.value)}
                         />
                         <Button
                           type="primary"
-                          shape="circle"
                           title="Mint new item"
+                          loading={loading.mintItem}
                           icon={<ArrowRightOutlined />}
                           onClick={handleMintItem}
                         />
