@@ -22,8 +22,9 @@ const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x18Ce4A4D1
 
 export const contract = new Contract(contractAddress, contractABI);
 export const cfav1ForwarderContract = new Contract(cfav1ForwarderContractAddress, cfav1ForwarderABI);
+
 export const graphqlClient = new GraphQLClient(
-  process.env.NEXT_PUBLIC_SUBGRAPH_URL || "https://api.thegraph.com/subgraphs/name/superfluid-finance/protocol-v1-mumbai",
+  process.env.NEXT_PUBLIC_SUBGRAPH_URL || "https://api.thegraph.com/subgraphs/name/salmandabbakuti/super-unlockable",
   { headers: {} }
 );
 

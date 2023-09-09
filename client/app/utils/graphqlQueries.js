@@ -16,19 +16,36 @@ export const GET_STREAMS = gql`
       where: $where
     ) {
       id
-      currentFlowRate
-      sender {
-        id
-      }
-      receiver {
-        id
-      }
-      token {
-        id
-      }
-      streamedUntilUpdatedAt
-      createdAtTimestamp
-      updatedAtTimestamp
+      sender
+      receiver
+      token
+      flowRate
+      txHash
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_TOKENS = gql`
+  query tokens(
+    $skip: Int
+    $first: Int
+    $orderBy: Token_orderBy
+    $orderDirection: OrderDirection
+    $where: Token_filter
+  ) {
+    tokens(
+      skip: $skip
+      first: $first
+      orderBy: $orderBy
+      orderDirection: $orderDirection
+      where: $where
+    ) {
+      id
+      owner
+      uri
+      createdAt
     }
   }
 `;

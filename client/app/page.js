@@ -12,7 +12,8 @@ import {
   Card,
   Popconfirm,
   Statistic,
-  Avatar
+  Avatar,
+  Empty
 } from "antd";
 import {
   SyncOutlined,
@@ -25,7 +26,7 @@ import {
   SettingOutlined
 } from "@ant-design/icons";
 import { graphqlClient as client } from "./utils";
-import { GET_STREAMS } from "./utils/graphqlQueries";
+import { GET_STREAMS, GET_TOKENS } from "./utils/graphqlQueries";
 import {
   calculateFlowRateInTokenPerMonth,
   calculateFlowRateInWeiPerSecond,
@@ -50,7 +51,30 @@ export default function Home() {
   const [updatedFlowRateInput, setUpdatedFlowRateInput] = useState(0);
   const [loading, setLoading] = useState({ connect: false });
   const [flowRateInput, setFlowRateInput] = useState(0);
+  const [items, setItems] = useState([]);
+  const [mintToAddress, setMintToAddress] = useState("");
 
+  const getItems = async () => {
+    setDataLoading(true);
+    client
+      .request(GET_TOKENS, {
+        skip: 0,
+        first: 100,
+        orderBy: "createdAt",
+        orderDirection: "desc",
+        where: {}
+      })
+      .then((data) => {
+        console.log("Items: ", data.tokens);
+        setItems(data.tokens);
+        setDataLoading(false);
+      })
+      .catch((err) => {
+        message.error("Something went wrong!");
+        console.error("failed to get items: ", err);
+        setDataLoading(false);
+      });
+  };
   const getStreamsToContract = async () => {
     setDataLoading(true);
     try {
@@ -218,10 +242,28 @@ export default function Home() {
     }
   };
 
-  const handleMintItem = async () => { };
+  const handleMintItem = async () => {
+    if (!account || !provider) return message.error("Please connect wallet first");
+    if (!mintToAddress) return message.error("Please enter address to mint to");
+    try {
+      setLoading(true);
+      const signer = provider.getSigner();
+      const tx = await contract.connect(signer).mintItem(mintToAddress);
+      await tx.wait();
+      message.success("Item minted successfully");
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      message.error("Failed to mint item");
+      console.error("failed to mint item: ", err);
+    }
+  };
 
   useEffect(() => {
-    if (account) getStreamsToContract();
+    if (account) {
+      getStreamsToContract();
+      getItems();
+    }
   }, [account]);
 
   return (
@@ -401,20 +443,75 @@ export default function Home() {
           </Button>
         )}
       </div>
-      {/* <Space>
-        <Input.Search
-          placeholder="Search by address, token or transaction hash"
-          value={searchInput}
-          enterButton
-          allowClear
-          loading={dataLoading}
-          onSearch={getStreamsToContract}
-          onChange={(e) => setSearchInput(e.target.value)}
-        />
-        <Button type="primary" onClick={getStreamsToContract}>
-          <SyncOutlined />
-        </Button>
-      </Space> */}
+      <div>
+        <h1 style={{ textAlign: "center" }}>Your Items</h1>
+        <Card
+          className={styles.cardContainer}
+          hoverable
+          bordered
+          title="Mint new item"
+        // style={{ width: 300 }}
+        >
+          <p>
+            Mint a new item and unlock your super powers
+          </p>
+          <Space.Compact>
+            <Input
+              type="text"
+              value={mintToAddress}
+              placeholder="Mint to address"
+              onChange={(e) => setMintToAddress(e.target.value)}
+            />
+            <Button
+              type="primary"
+              shape="circle"
+              title="Mint new item"
+              icon={<ArrowRightOutlined />}
+              onClick={handleMintItem}
+            />
+          </Space.Compact>
+        </Card>
+
+        {
+          items?.length > 0 ? (
+            <div className={styles.cardContainer}>
+              {items.map((item) => (
+
+                <Card
+                  key={item.id}
+                  hoverable
+                  style={{ width: 300 }}
+                  cover={
+                    <Image
+                      src={item.uri}
+                      alt={item.uri}
+                      width={300}
+                      height={300}
+                    />
+                  }
+                // actions={[
+                //   <Button
+                //     type="primary"
+                //     icon={<SettingOutlined />}
+                //     onClick={() => handleMintItem(item.id)}
+                //   >
+                //     Mint
+                //   </Button>
+                // ]}
+                >
+                  <Card.Meta
+                    avatar={<Avatar src="/item.png" />}
+                    title={item.id}
+                    description={item.owner}
+                  />
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Empty description="No items found" />
+          )
+        }
+      </div>
     </div>
   );
 }
