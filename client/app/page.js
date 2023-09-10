@@ -281,136 +281,31 @@ export default function Home() {
                 label: "Account",
                 children: (
                   <div className={styles.cardContainer}>
-                    {stream?.flowRate !== "0" ? (
-                      <Card
-                        title="Your Stream to contract"
-                        bordered
-                        hoverable
-                        loading={dataLoading}
-                        style={{ width: 450 }}
-                        actions={[
-                          <p>
-                            Last Updated:{" "}
-                            {dayjs(stream?.lastUpdated * 1000).fromNow()}
-                          </p>
-                        ]}
-                        extra={
-                          <Space>
-                            <Button
-                              title="Refresh"
-                              type="primary"
-                              shape="circle"
-                              icon={<SyncOutlined spin={dataLoading} />}
-                              onClick={getStreamsToContract}
-                            />
-                            <Popconfirm
-                              title={
-                                <>
-                                  <h3>Enter new flow rate</h3>
-                                  <Input
-                                    type="number"
-                                    placeholder="Flowrate in no. of tokens"
-                                    addonAfter="/month"
-                                    value={updatedFlowRateInput}
-                                    onChange={(e) =>
-                                      setUpdatedFlowRateInput(e.target.value)
-                                    }
-                                  />
-                                  <p>
-                                    *You are Streaming{" "}
-                                    <b>
-                                      {updatedFlowRateInput || 0} fDAIx/month
-                                    </b>{" "}
-                                    to contract
-                                  </p>
-                                </>
-                              }
-                              onConfirm={() =>
-                                handleUpdateStreamToContract(
-                                  updatedFlowRateInput
-                                )
-                              }
-                            >
-                              <Button
-                                title="Update"
-                                icon={<EditOutlined />}
-                                type="primary"
-                                shape="circle"
-                              />
-                            </Popconfirm>
-                            <Popconfirm
-                              title="Are you sure to delete?"
-                              onConfirm={handleDeleteStream}
-                            >
-                              <Button
-                                title="Delete"
-                                icon={<DeleteOutlined />}
-                                type="primary"
-                                shape="circle"
-                                danger
-                              />
-                            </Popconfirm>
-                          </Space>
-                        }
-                      >
-                        <h3 style={{ textAlign: "center" }}>
-                          {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
-                          fDAIx/mo
-                        </h3>
+                    <Card
+                      title="Your Stream to contract"
+                      bordered
+                      hoverable
+                      loading={dataLoading}
+                      actions={
+                        stream?.lastUpdated !== "0"
+                          ? [
+                            <p>
+                              Last Updated:{" "}
+                              {dayjs(stream?.lastUpdated * 1000).fromNow()}
+                            </p>
+                          ]
+                          : []
+                      }
+                      extra={
                         <Space>
-                          <Card style={{ float: "left" }}>
-                            <Statistic
-                              title="Sender (You)"
-                              value={
-                                stream?.sender?.slice(0, 5) +
-                                "..." +
-                                stream?.sender?.slice(-5)
-                              }
-                              precision={2}
-                              valueStyle={{
-                                color: "#3f8600",
-                                fontSize: "1rem"
-                              }}
-                            // prefix={<ArrowUpOutlined />}
-                            />
-                          </Card>
-                          <Image
-                            src="/flow_animation.gif"
-                            width={75}
-                            height={70}
+                          <Button
+                            title="Refresh"
+                            type="primary"
+                            shape="circle"
+                            icon={<SyncOutlined spin={dataLoading} />}
+                            onClick={getStreamsToContract}
                           />
-                          <Card style={{ float: "right" }}>
-                            <Statistic
-                              title="Receiver (Contract)"
-                              value={
-                                stream?.receiver?.slice(0, 5) +
-                                "..." +
-                                stream?.receiver?.slice(-5)
-                              }
-                              precision={2}
-                              valueStyle={{
-                                color: "#cf1322",
-                                fontSize: "1rem"
-                              }}
-                            // prefix={<ArrowDownOutlined />}
-                            // suffix="%"
-                            />
-                          </Card>
-                        </Space>
-                      </Card>
-                    ) : (
-                      <Card
-                        title="Your Stream to contract"
-                        // style={{ width: 500 }}
-                        extra={
-                          <Space>
-                            <Button
-                              title="Refresh"
-                              type="primary"
-                              shape="circle"
-                              icon={<SyncOutlined spin={dataLoading} />}
-                              onClick={getStreamsToContract}
-                            />
+                          {stream?.flowRate === "0" ? (
                             <Popconfirm
                               title={
                                 <>
@@ -442,15 +337,111 @@ export default function Home() {
                                 icon={<PlusCircleOutlined />}
                               />
                             </Popconfirm>
-                          </Space>
-                        }
-                      >
+                          ) : (
+                            <>
+                              <Popconfirm
+                                title={
+                                  <>
+                                    <h3>Enter new flow rate</h3>
+                                    <Input
+                                      type="number"
+                                      placeholder="Flowrate in no. of tokens"
+                                      addonAfter="/month"
+                                      value={updatedFlowRateInput}
+                                      onChange={(e) =>
+                                        setUpdatedFlowRateInput(e.target.value)
+                                      }
+                                    />
+                                    <p>
+                                      *You are Streaming{" "}
+                                      <b>
+                                        {updatedFlowRateInput || 0} fDAIx/month
+                                      </b>{" "}
+                                      to contract
+                                    </p>
+                                  </>
+                                }
+                                onConfirm={() =>
+                                  handleUpdateStreamToContract(
+                                    updatedFlowRateInput
+                                  )
+                                }
+                              >
+                                <Button
+                                  title="Update"
+                                  icon={<EditOutlined />}
+                                  type="primary"
+                                  shape="circle"
+                                />
+                              </Popconfirm>
+                              <Popconfirm
+                                title="Are you sure to delete?"
+                                onConfirm={handleDeleteStream}
+                              >
+                                <Button
+                                  title="Delete"
+                                  icon={<DeleteOutlined />}
+                                  type="primary"
+                                  shape="circle"
+                                  danger
+                                />
+                              </Popconfirm>
+                            </>
+                          )}
+                        </Space>
+                      }
+                    >
+                      {stream?.flowRate === "0" ? (
                         <p>
                           No stream found. Open a stream to contract and unlock
                           your super powers
                         </p>
-                      </Card>
-                    )}
+                      ) : (
+                        <>
+                          <h3 style={{ textAlign: "center" }}>
+                            {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
+                            fDAIx/mo
+                          </h3>
+                          <Space>
+                            <Card>
+                              <Statistic
+                                title="Sender (You)"
+                                value={
+                                  stream?.sender?.slice(0, 5) +
+                                  "..." +
+                                  stream?.sender?.slice(-5)
+                                }
+                                precision={2}
+                                valueStyle={{
+                                  color: "#3f8600",
+                                  fontSize: "1rem"
+                                }}
+                              />
+                            </Card>
+                            <Image
+                              src="/flow_animation.gif"
+                              width={75}
+                              height={70}
+                            />
+                            <Card>
+                              <Statistic
+                                title="Receiver (Contract)"
+                                value={
+                                  stream?.receiver?.slice(0, 5) +
+                                  "..." +
+                                  stream?.receiver?.slice(-5)
+                                }
+                                precision={2}
+                                valueStyle={{
+                                  color: "#cf1322",
+                                  fontSize: "1rem"
+                                }}
+                              />
+                            </Card>
+                          </Space>
+                        </>
+                      )}
+                    </Card>
                   </div>
                 )
               },
@@ -461,7 +452,6 @@ export default function Home() {
                   <div>
                     <h1 style={{ textAlign: "center" }}>Your Items</h1>
                     <Card
-                      className={styles.cardContainer}
                       hoverable
                       bordered
                       title="Mint new item"
@@ -485,8 +475,8 @@ export default function Home() {
                       </Space.Compact>
                     </Card>
                     <Row gutter={[16, 18]}>
-                      {
-                        items?.length > 0 ? items.map((item, index) => {
+                      {items?.length > 0 ? (
+                        items.map((item) => {
                           const { id, owner, uri, createdAt } = item;
                           console.log("uri: ", uri);
                           const base64Uri = uri.split(",")[1];
@@ -494,7 +484,7 @@ export default function Home() {
                           const metadata = JSON.parse(atob(base64Uri));
                           console.log("metadata: ", metadata);
                           return (
-                            <Col key={index} xs={24} sm={12} md={8} lg={6}>
+                            <Col key={id} xs={24} sm={12} md={8} lg={6}>
                               <Card
                                 hoverable
                                 style={{
@@ -535,8 +525,10 @@ export default function Home() {
                               </Card>
                             </Col>
                           );
-                        }) : <Empty description="No items found" />
-                      }
+                        })
+                      ) : (
+                        <Empty description="No items found" />
+                      )}
                     </Row>
                   </div>
                 )
