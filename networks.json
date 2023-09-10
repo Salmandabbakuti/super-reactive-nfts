@@ -1,0 +1,12 @@
+{
+  "mumbai": {
+    "SuperUnlockable": {
+      "address": "0x18Ce4A4D16f1DDFe9dbcf900c49e0316DC47B115",
+      "startBlock": 39892863
+    },
+    "CFAV1": {
+      "address": "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873",
+      "startBlock": 39892863
+    }
+  }
+}
