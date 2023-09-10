@@ -26,13 +26,13 @@ import {
   WalletOutlined,
   WalletFilled,
   ArrowRightOutlined,
-  SettingOutlined
 } from "@ant-design/icons";
 import { graphqlClient as client } from "./utils";
-import { GET_STREAMS, GET_TOKENS } from "./utils/graphqlQueries";
+import { GET_TOKENS } from "./utils/graphqlQueries";
 import {
   calculateFlowRateInTokenPerMonth,
   calculateFlowRateInWeiPerSecond,
+  calculateTotalStreamedSinceLastUpdate,
   cfav1ForwarderContract,
   contract
 } from "./utils";
@@ -56,6 +56,7 @@ export default function Home() {
   const [flowRateInput, setFlowRateInput] = useState(0);
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
+  const [amountStreamedSinceLastUpdate, setAmountStreamedSinceLastUpdate] = useState(0);
 
   const getItems = async () => {
     setDataLoading(true);
@@ -84,7 +85,7 @@ export default function Home() {
       const { lastUpdated, flowRate } = await cfav1ForwarderContract
         .connect(provider)
         .getFlowInfo(supportedTokenAddress, account, contractAddress);
-      const stream = {
+      const stream = flowRate.toString() === "0" ? null : {
         lastUpdated: lastUpdated.toString(),
         flowRate: flowRate.toString(),
         sender: account,
@@ -101,6 +102,7 @@ export default function Home() {
   };
   const handleDisconnectWallet = async () => {
     setAccount(null);
+    setStream(null);
     setProvider(null);
     message.success("Wallet disconnected");
   };
@@ -255,9 +257,20 @@ export default function Home() {
   useEffect(() => {
     if (account) {
       getStreamsToContract();
-      getItems();
     }
   }, [account]);
+
+
+  useEffect(() => {
+    if (stream) {
+      const intervalId = setInterval(() => {
+        const amountStreamedSinceLastUpdate = calculateTotalStreamedSinceLastUpdate(stream?.flowRate, stream?.lastUpdated);
+        setAmountStreamedSinceLastUpdate(amountStreamedSinceLastUpdate);
+      }, 1000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [stream]);
 
   return (
     <div>
@@ -273,6 +286,7 @@ export default function Home() {
           <Tabs
             type="line"
             animated
+            onTabClick={(key) => key === "2" && getItems()}
             style={{ marginBottom: 20 }}
             defaultActiveKey="1"
             items={[
@@ -287,13 +301,12 @@ export default function Home() {
                       hoverable
                       loading={dataLoading}
                       actions={
-                        stream?.lastUpdated !== "0"
-                          ? [
-                            <p>
-                              Last Updated:{" "}
-                              {dayjs(stream?.lastUpdated * 1000).fromNow()}
-                            </p>
-                          ]
+                        stream ? [
+                          <p>
+                            Last Updated:{" "}
+                            {dayjs(stream?.lastUpdated * 1000).fromNow()}
+                          </p>
+                        ]
                           : []
                       }
                       extra={
@@ -305,39 +318,7 @@ export default function Home() {
                             icon={<SyncOutlined spin={dataLoading} />}
                             onClick={getStreamsToContract}
                           />
-                          {stream?.flowRate === "0" ? (
-                            <Popconfirm
-                              title={
-                                <>
-                                  <h3>Enter flow rate</h3>
-                                  <Input
-                                    type="number"
-                                    placeholder="Flowrate in no. of tokens"
-                                    addonAfter="/month"
-                                    value={flowRateInput}
-                                    onChange={(e) =>
-                                      setFlowRateInput(e.target.value)
-                                    }
-                                  />
-                                  <p>
-                                    *You are Streaming{" "}
-                                    <b>{flowRateInput || 0} fDAIx/month</b> to
-                                    contract
-                                  </p>
-                                </>
-                              }
-                              onConfirm={() =>
-                                handleCreateStreamToContract(flowRateInput)
-                              }
-                            >
-                              <Button
-                                type="primary"
-                                shape="circle"
-                                title="Create new stream"
-                                icon={<PlusCircleOutlined />}
-                              />
-                            </Popconfirm>
-                          ) : (
+                          {stream ? (
                             <>
                               <Popconfirm
                                 title={
@@ -387,21 +368,46 @@ export default function Home() {
                                 />
                               </Popconfirm>
                             </>
+                          ) : (
+                            <Popconfirm
+                              title={
+                                <>
+                                  <h3>Enter flow rate</h3>
+                                  <Input
+                                    type="number"
+                                    placeholder="Flowrate in no. of tokens"
+                                    addonAfter="/month"
+                                    value={flowRateInput}
+                                    onChange={(e) =>
+                                      setFlowRateInput(e.target.value)
+                                    }
+                                  />
+                                  <p>
+                                    *You are Streaming{" "}
+                                    <b>{flowRateInput || 0} fDAIx/month</b> to
+                                    contract
+                                  </p>
+                                </>
+                              }
+                              onConfirm={() =>
+                                handleCreateStreamToContract(flowRateInput)
+                              }
+                            >
+                              <Button
+                                type="primary"
+                                shape="circle"
+                                title="Create new stream"
+                                icon={<PlusCircleOutlined />}
+                              />
+                            </Popconfirm>
                           )}
                         </Space>
                       }
                     >
-                      {stream?.flowRate === "0" ? (
-                        <p>
-                          No stream found. Open a stream to contract and unlock
-                          your super powers
-                        </p>
-                      ) : (
+                      {stream ? (
                         <>
-                          <h3 style={{ textAlign: "center" }}>
-                            {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
-                            fDAIx/mo
-                          </h3>
+                          <h3 style={{ textAlign: "center" }}>Total Amount Streamed</h3>
+                          <h3 style={{ textAlign: "center" }}>{amountStreamedSinceLastUpdate} fDAIx</h3>
                           <Space>
                             <Card>
                               <Statistic
@@ -439,7 +445,16 @@ export default function Home() {
                               />
                             </Card>
                           </Space>
+                          <h3 style={{ textAlign: "center" }}>
+                            {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
+                            fDAIx/mo
+                          </h3>
                         </>
+                      ) : (
+                        <p>
+                          No stream found. Open a stream to contract and unlock
+                          your super powers
+                        </p>
                       )}
                     </Card>
                   </div>
@@ -478,9 +493,7 @@ export default function Home() {
                       {items?.length > 0 ? (
                         items.map((item) => {
                           const { id, owner, uri, createdAt } = item;
-                          console.log("uri: ", uri);
                           const base64Uri = uri.split(",")[1];
-                          console.log("base64Uri: ", base64Uri);
                           const metadata = JSON.parse(atob(base64Uri));
                           console.log("metadata: ", metadata);
                           return (

@@ -43,3 +43,9 @@ export const calculateFlowRateInWeiPerSecond = (amount) => {
     .toString();
   return flowRateInWeiPerSecond;
 };
+
+export const calculateTotalStreamedSinceLastUpdate = (flowRate, lastUpdated) => {
+  const timeElapsed = Date.now() / 1000 - lastUpdated;
+  const totalStreamedInToken = (formatEther(flowRate) * timeElapsed).toFixed(9);
+  return totalStreamedInToken;
+};  
