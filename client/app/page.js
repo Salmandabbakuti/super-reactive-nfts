@@ -25,7 +25,7 @@ import {
   PlusCircleOutlined,
   WalletOutlined,
   WalletFilled,
-  ArrowRightOutlined,
+  ArrowRightOutlined
 } from "@ant-design/icons";
 import { graphqlClient as client } from "./utils";
 import { GET_TOKENS } from "./utils/graphqlQueries";
@@ -56,7 +56,10 @@ export default function Home() {
   const [flowRateInput, setFlowRateInput] = useState(0);
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
-  const [amountStreamedSinceLastUpdate, setAmountStreamedSinceLastUpdate] = useState(0);
+  const [
+    amountStreamedSinceLastUpdate,
+    setAmountStreamedSinceLastUpdate
+  ] = useState(0);
 
   const getItems = async () => {
     setDataLoading(true);
@@ -85,12 +88,15 @@ export default function Home() {
       const { lastUpdated, flowRate } = await cfav1ForwarderContract
         .connect(provider)
         .getFlowInfo(supportedTokenAddress, account, contractAddress);
-      const stream = flowRate.toString() === "0" ? null : {
-        lastUpdated: lastUpdated.toString(),
-        flowRate: flowRate.toString(),
-        sender: account,
-        receiver: contractAddress
-      };
+      const stream =
+        flowRate.toString() === "0"
+          ? null
+          : {
+            lastUpdated: lastUpdated.toString(),
+            flowRate: flowRate.toString(),
+            sender: account,
+            receiver: contractAddress
+          };
       console.log("stream: ", stream);
       setStream(stream);
       setDataLoading(false);
@@ -260,11 +266,13 @@ export default function Home() {
     }
   }, [account]);
 
-
   useEffect(() => {
     if (stream) {
       const intervalId = setInterval(() => {
-        const amountStreamedSinceLastUpdate = calculateTotalStreamedSinceLastUpdate(stream?.flowRate, stream?.lastUpdated);
+        const amountStreamedSinceLastUpdate = calculateTotalStreamedSinceLastUpdate(
+          stream?.flowRate,
+          stream?.lastUpdated
+        );
         setAmountStreamedSinceLastUpdate(amountStreamedSinceLastUpdate);
       }, 1000);
 
@@ -301,12 +309,13 @@ export default function Home() {
                       hoverable
                       loading={dataLoading}
                       actions={
-                        stream ? [
-                          <p>
-                            Last Updated:{" "}
-                            {dayjs(stream?.lastUpdated * 1000).fromNow()}
-                          </p>
-                        ]
+                        stream
+                          ? [
+                            <p>
+                              Last Updated:{" "}
+                              {dayjs(stream?.lastUpdated * 1000).fromNow()}
+                            </p>
+                          ]
                           : []
                       }
                       extra={
@@ -406,8 +415,17 @@ export default function Home() {
                     >
                       {stream ? (
                         <>
-                          <h3 style={{ textAlign: "center" }}>Total Amount Streamed</h3>
-                          <h3 style={{ textAlign: "center" }}>{amountStreamedSinceLastUpdate} fDAIx</h3>
+                          <div style={{ textAlign: "center" }}>
+                            <Statistic
+                              title="Total Amount Streamed (Since Updated)"
+                              valueStyle={{
+                                color: "#10bb35",
+                                fontSize: "1.5rem"
+                              }}
+                              value={`${amountStreamedSinceLastUpdate} fDAIx`}
+                              precision={9}
+                            />
+                          </div>
                           <Space>
                             <Card>
                               <Statistic
@@ -417,15 +435,11 @@ export default function Home() {
                                   "..." +
                                   stream?.sender?.slice(-5)
                                 }
-                                precision={2}
-                                valueStyle={{
-                                  color: "#3f8600",
-                                  fontSize: "1rem"
-                                }}
                               />
                             </Card>
                             <Image
                               src="/flow_animation.gif"
+                              alt="flow-animation"
                               width={75}
                               height={70}
                             />
@@ -437,17 +451,12 @@ export default function Home() {
                                   "..." +
                                   stream?.receiver?.slice(-5)
                                 }
-                                precision={2}
-                                valueStyle={{
-                                  color: "#cf1322",
-                                  fontSize: "1rem"
-                                }}
                               />
                             </Card>
                           </Space>
                           <h3 style={{ textAlign: "center" }}>
                             {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
-                            fDAIx/mo
+                            fDAIx/month
                           </h3>
                         </>
                       ) : (
