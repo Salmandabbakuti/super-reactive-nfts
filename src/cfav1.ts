@@ -1,4 +1,10 @@
-import { Address, ethereum, crypto, Bytes } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  ethereum,
+  crypto,
+  Bytes,
+  BigInt
+} from "@graphprotocol/graph-ts";
 import { FlowUpdated as FlowUpdatedEvent } from "../generated/CFAV1/CFAV1";
 import { Stream, StreamRevision } from "../generated/schema";
 
@@ -71,6 +77,7 @@ export function handleFlowUpdated(event: FlowUpdatedEvent): void {
   const sender = event.params.sender;
   const receiver = event.params.receiver;
   const token = event.params.token;
+  const flowRate = event.params.flowRate;
 
   // Create a streamRevision entity for this stream if one doesn't exist.
   const streamRevision = getOrInitStreamRevision(sender, receiver, token);
@@ -80,6 +87,11 @@ export function handleFlowUpdated(event: FlowUpdatedEvent): void {
     token,
     streamRevision.revisionIndex
   );
+
+  // increment revision index if flowRate is 0 (flow is closed)
+  if (flowRate.equals(BigInt.fromI32(0))) {
+    streamRevision.revisionIndex = streamRevision.revisionIndex + 1;
+  }
   // set stream id
   streamRevision.mostRecentStream = streamId;
   streamRevision.save();
@@ -95,7 +107,7 @@ export function handleFlowUpdated(event: FlowUpdatedEvent): void {
     stream.createdAt = currentTimestamp;
     stream.txHash = event.transaction.hash.toHex();
   }
-  stream.flowRate = event.params.flowRate;
+  stream.flowRate = flowRate;
   stream.updatedAt = currentTimestamp;
   stream.save();
 }
