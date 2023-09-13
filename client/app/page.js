@@ -62,58 +62,6 @@ export default function Home() {
     setAmountStreamedSinceLastUpdate
   ] = useState(0);
 
-  const getItems = async () => {
-    setDataLoading(true);
-    client
-      .request(GET_TOKENS, {
-        skip: 0,
-        first: 100,
-        orderBy: "createdAt",
-        orderDirection: "desc",
-        where: {}
-      })
-      .then((data) => {
-        console.log("Items: ", data.tokens);
-        setItems(data.tokens);
-        setDataLoading(false);
-      })
-      .catch((err) => {
-        message.error("Something went wrong!");
-        console.error("failed to get items: ", err);
-        setDataLoading(false);
-      });
-  };
-  const getStreamsToContract = async () => {
-    setDataLoading(true);
-    try {
-      const { lastUpdated, flowRate } = await cfav1ForwarderContract
-        .connect(provider)
-        .getFlowInfo(supportedTokenAddress, account, contractAddress);
-      const stream =
-        flowRate.toString() === "0"
-          ? null
-          : {
-            lastUpdated: lastUpdated.toString(),
-            flowRate: flowRate.toString(),
-            sender: account,
-            receiver: contractAddress
-          };
-      console.log("stream: ", stream);
-      setStream(stream);
-      setDataLoading(false);
-    } catch (err) {
-      message.error("Failed to get streams to contract");
-      setDataLoading(false);
-      console.error("failed to get streams to contract: ", err);
-    }
-  };
-  const handleDisconnectWallet = async () => {
-    setAccount(null);
-    setStream(null);
-    setProvider(null);
-    message.success("Wallet disconnected");
-  };
-
   const handleConnectWallet = async () => {
     if (!window?.ethereum) {
       return message.error(
@@ -174,6 +122,13 @@ export default function Home() {
     } finally {
       setLoading({ connect: false });
     }
+  };
+
+  const handleDisconnectWallet = async () => {
+    setAccount(null);
+    setStream(null);
+    setProvider(null);
+    message.success("Wallet disconnected");
   };
 
   const handleCreateStreamToContract = async (flowRate) => {
@@ -263,9 +218,57 @@ export default function Home() {
     }
   };
 
+  const getStreamToContract = async () => {
+    setDataLoading(true);
+    try {
+      const { lastUpdated, flowRate } = await cfav1ForwarderContract
+        .connect(provider)
+        .getFlowInfo(supportedTokenAddress, account, contractAddress);
+      const stream =
+        flowRate.toString() === "0"
+          ? null
+          : {
+            lastUpdated: lastUpdated.toString(),
+            flowRate: flowRate.toString(),
+            sender: account,
+            receiver: contractAddress
+          };
+      console.log("stream: ", stream);
+      setStream(stream);
+      setDataLoading(false);
+    } catch (err) {
+      message.error("Failed to get streams to contract");
+      setDataLoading(false);
+      console.error("failed to get streams to contract: ", err);
+    }
+  };
+
+  const getItems = async () => {
+    setDataLoading(true);
+    client
+      .request(GET_TOKENS, {
+        skip: 0,
+        first: 100,
+        orderBy: "createdAt",
+        orderDirection: "desc",
+        where: {}
+      })
+      .then((data) => {
+        console.log("Items: ", data.tokens);
+        setItems(data.tokens);
+        setDataLoading(false);
+      })
+      .catch((err) => {
+        message.error("Something went wrong!");
+        console.error("failed to get items: ", err);
+        setDataLoading(false);
+      });
+  };
+
   useEffect(() => {
     if (account) {
-      getStreamsToContract();
+      getStreamToContract();
+      getItems();
     }
   }, [account]);
 
@@ -297,7 +300,6 @@ export default function Home() {
           <Tabs
             type="line"
             animated
-            onTabClick={(key) => key === "2" && getItems()}
             style={{ marginBottom: 20 }}
             defaultActiveKey="1"
             items={[
@@ -318,7 +320,7 @@ export default function Home() {
                             type="primary"
                             shape="circle"
                             icon={<SyncOutlined spin={dataLoading} />}
-                            onClick={getStreamsToContract}
+                            onClick={getStreamToContract}
                           />
                           {stream ? (
                             <>
@@ -493,52 +495,50 @@ export default function Home() {
                 children: (
                   <div>
                     <h1 style={{ textAlign: "center" }}>Items</h1>
+                    <Button type="primary" onClick={getItems}>
+                      Refresh
+                    </Button>
                     <Row gutter={[16, 18]}>
                       {items?.length > 0 ? (
                         items.map((item) => {
-                          const { id, owner, uri, createdAt } = item;
+                          const { id, uri, createdAt } = item;
                           const base64Uri = uri.split(",")[1];
                           const metadata = JSON.parse(atob(base64Uri));
                           console.log("metadata: ", metadata);
                           return (
-                            <Col key={id} xs={24} sm={12} md={8} lg={6}>
+                            <Col key={id} xs={20} sm={10} md={6} lg={4}>
                               <Card
                                 hoverable
+                                bordered
+                                loading={dataLoading}
+                                actions={[
+                                  <p>{dayjs(createdAt * 1000).fromNow()}</p>
+                                ]}
                                 style={{
                                   cursor: "pointer",
-                                  width: 300,
+                                  width: "100%",
                                   marginTop: 14,
                                   borderRadius: 10,
                                   border: "1px solid #d9d9d9"
                                 }}
-                                loading={dataLoading}
-                                title={
-                                  <Card.Meta
-                                    avatar={
-                                      <Avatar
-                                        size="large"
-                                        src={`https://api.dicebear.com/5.x/open-peeps/svg?seed=${owner}`}
-                                      />
-                                    }
-                                    title={`${owner?.slice(
-                                      0,
-                                      10
-                                    )}...${owner?.slice(-6)}`}
+                                cover={
+                                  <img
+                                    alt="item"
+                                    src={metadata?.image}
+                                    style={{
+                                      marginTop: 10,
+                                      width: "100%",
+                                      maxHeight: "260px", // You can adjust this value
+                                      objectFit: "contain",
+                                      borderRadius: 10
+                                    }}
                                   />
                                 }
-                                actions={[
-                                  <p>{dayjs(createdAt * 1000).fromNow()}</p>
-                                ]}
                               >
-                                <Card.Meta description={metadata?.name} />
-                                {metadata?.image && (
-                                  <img
-                                    width={260}
-                                    style={{ marginTop: 10, borderRadius: 10 }}
-                                    alt="post-media"
-                                    src={metadata?.image}
-                                  />
-                                )}
+                                <Card.Meta
+                                  title={metadata?.name}
+                                  description={"SuperUnlockable"}
+                                />
                               </Card>
                             </Col>
                           );
