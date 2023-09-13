@@ -16,7 +16,8 @@ import {
   Empty,
   Tabs,
   Row,
-  Col
+  Col,
+  Divider
 } from "antd";
 import {
   SyncOutlined,
@@ -255,7 +256,9 @@ export default function Home() {
       setLoading({ mintItem: false });
     } catch (err) {
       setLoading({ mintItem: false });
-      message.error("Failed to mint item");
+      message.error(
+        "Failed to mint item. Make sure your stream deposit raised enough to mint item"
+      );
       console.error("failed to mint item: ", err);
     }
   };
@@ -308,16 +311,6 @@ export default function Home() {
                       bordered
                       hoverable
                       loading={dataLoading}
-                      actions={
-                        stream
-                          ? [
-                            <p>
-                              Last Updated:{" "}
-                              {dayjs(stream?.lastUpdated * 1000).fromNow()}
-                            </p>
-                          ]
-                          : []
-                      }
                       extra={
                         <Space>
                           <Button
@@ -458,6 +451,31 @@ export default function Home() {
                             {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
                             fDAIx/month
                           </h3>
+                          <Divider orientation="right" plain>
+                            Last Updated:{" "}
+                            {dayjs(stream?.lastUpdated * 1000).fromNow()}
+                          </Divider>
+                          <div style={{ textAlign: "center" }}>
+                            <h3>Mint an item</h3>
+                            <p>Mint a new item and unlock your super powers</p>
+                            <Space.Compact style={{ width: '90%' }}>
+                              <Input
+                                type="text"
+                                value={mintToAddress}
+                                placeholder="Address to mint to"
+                                onChange={(e) =>
+                                  setMintToAddress(e.target.value)
+                                }
+                              />
+                              <Button
+                                type="primary"
+                                title="Mint new item"
+                                loading={loading.mintItem}
+                                icon={<ArrowRightOutlined />}
+                                onClick={handleMintItem}
+                              />
+                            </Space.Compact>
+                          </div>
                         </>
                       ) : (
                         <p>
@@ -474,30 +492,7 @@ export default function Home() {
                 label: "Items",
                 children: (
                   <div>
-                    <h1 style={{ textAlign: "center" }}>Your Items</h1>
-                    <Card
-                      hoverable
-                      bordered
-                      title="Mint new item"
-                      style={{ width: 300 }}
-                    >
-                      <p>Mint a new item and unlock your super powers</p>
-                      <Space.Compact>
-                        <Input
-                          type="text"
-                          value={mintToAddress}
-                          placeholder="Address to mint to"
-                          onChange={(e) => setMintToAddress(e.target.value)}
-                        />
-                        <Button
-                          type="primary"
-                          title="Mint new item"
-                          loading={loading.mintItem}
-                          icon={<ArrowRightOutlined />}
-                          onClick={handleMintItem}
-                        />
-                      </Space.Compact>
-                    </Card>
+                    <h1 style={{ textAlign: "center" }}>Items</h1>
                     <Row gutter={[16, 18]}>
                       {items?.length > 0 ? (
                         items.map((item) => {
