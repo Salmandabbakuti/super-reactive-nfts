@@ -6,6 +6,7 @@ const contractABI = [
   "function mintItem(address _to)",
   "function setRequiredDeposit(uint256 _amount)",
   "function withdrawFunds()",
+  "function currentTokenId() view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function requiredDeposit() view returns (uint256)",
   "function getFlowInfo(address _token, address _sender, address _receiver) view returns (uint256 lastUpdated, int96 flowRate, uint256 deposit, uint256 owedDeposit)",
@@ -18,7 +19,7 @@ const cfav1ForwarderABI = [
   "function getFlowInfo(address token, address sender, address receiver) view returns (uint256 lastUpdated, int96 flowRate, uint256 deposit, uint256 owedDeposit)"
 ];
 const cfav1ForwarderContractAddress = process.env.NEXT_PUBLIC_CFAV1_FORWARDER_ADDRESS || "0xcfA132E353cB4E398080B9700609bb008eceB125";
-const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0x18Ce4A4D16f1DDFe9dbcf900c49e0316DC47B115";
+const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xd805D871b1aAcb17F346e2d957aB5d31B383d57C";
 
 export const contract = new Contract(contractAddress, contractABI);
 export const cfav1ForwarderContract = new Contract(cfav1ForwarderContractAddress, cfav1ForwarderABI);
