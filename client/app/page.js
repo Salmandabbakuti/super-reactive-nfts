@@ -244,21 +244,27 @@ export default function Home() {
 
   const getItems = async () => {
     setDataLoading(true);
-    const currentTokenId = await contract.connect(provider).currentTokenId();
-    console.log("currentTokenId: ", currentTokenId);
-    const items = [];
-    for (let i = 0; i < currentTokenId.toNumber(); i++) {
-      const uri = await contract.connect(provider).tokenURI(i);
-      console.log("uri: ", uri);
-      const base64Uri = uri.split(",")[1];
-      const metadata = JSON.parse(atob(base64Uri));
-      console.log("metadata: ", metadata);
-      const item = { id: i, ...metadata };
-      items.push(item);
+    try {
+      const currentTokenId = await contract.connect(provider).currentTokenId();
+      console.log("currentTokenId: ", currentTokenId);
+      const items = [];
+      for (let i = 0; i < currentTokenId.toNumber(); i++) {
+        const uri = await contract.connect(provider).tokenURI(i);
+        console.log("uri: ", uri);
+        const base64Uri = uri.split(",")[1];
+        const metadata = JSON.parse(atob(base64Uri));
+        console.log("metadata: ", metadata);
+        const item = { id: i, ...metadata };
+        items.push(item);
+      }
+      console.log("items: ", items);
+      setItems(items);
+      setDataLoading(false);
+    } catch (err) {
+      setDataLoading(false);
+      console.error("failed to get items: ", err);
+      message.error("Failed to get items");
     }
-    setItems(items);
-    setDataLoading(false);
-    console.log("items: ", items);
   };
 
   useEffect(() => {
@@ -491,15 +497,21 @@ export default function Home() {
                 children: (
                   <div>
                     <h1 style={{ textAlign: "center" }}>Items</h1>
-                    <Button type="primary" onClick={getItems}>
-                      Refresh
-                    </Button>
+                    <Button
+                      type="primary"
+                      icon={<SyncOutlined spin={dataLoading} />}
+                      onClick={getItems}
+                    />
                     <Row gutter={[16, 18]}>
                       {items?.length > 0 ? (
                         items.map((item) => {
                           return (
                             <Col key={item?.id} xs={20} sm={10} md={6} lg={4}>
-                              <a href={`https://testnet.rarible.com/token/polygon/${contractAddress}:${item?.id}`} target="_blank" rel="noreferrer">
+                              <a
+                                href={`https://testnet.rarible.com/token/polygon/${contractAddress}:${item?.id}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
                                 <Card
                                   hoverable
                                   bordered
