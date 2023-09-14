@@ -6,6 +6,7 @@ const contractABI = [
   "function mintItem(address _to)",
   "function setRequiredDeposit(uint256 _amount)",
   "function withdrawFunds()",
+  "function currentTokenId() view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function requiredDeposit() view returns (uint256)",
   "function getFlowInfo(address _token, address _sender, address _receiver) view returns (uint256 lastUpdated, int96 flowRate, uint256 deposit, uint256 owedDeposit)",

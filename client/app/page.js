@@ -12,7 +12,6 @@ import {
   Card,
   Popconfirm,
   Statistic,
-  Avatar,
   Empty,
   Tabs,
   Row,
@@ -245,24 +244,21 @@ export default function Home() {
 
   const getItems = async () => {
     setDataLoading(true);
-    client
-      .request(GET_TOKENS, {
-        skip: 0,
-        first: 100,
-        orderBy: "createdAt",
-        orderDirection: "desc",
-        where: {}
-      })
-      .then((data) => {
-        console.log("Items: ", data.tokens);
-        setItems(data.tokens);
-        setDataLoading(false);
-      })
-      .catch((err) => {
-        message.error("Something went wrong!");
-        console.error("failed to get items: ", err);
-        setDataLoading(false);
-      });
+    const currentTokenId = await contract.connect(provider).currentTokenId();
+    console.log("currentTokenId: ", currentTokenId);
+    const items = [];
+    for (let i = 0; i < currentTokenId.toNumber(); i++) {
+      const uri = await contract.connect(provider).tokenURI(i);
+      console.log("uri: ", uri);
+      const base64Uri = uri.split(",")[1];
+      const metadata = JSON.parse(atob(base64Uri));
+      console.log("metadata: ", metadata);
+      const item = { id: i, ...metadata };
+      items.push(item);
+    }
+    setItems(items);
+    setDataLoading(false);
+    console.log("items: ", items);
   };
 
   useEffect(() => {
@@ -501,19 +497,12 @@ export default function Home() {
                     <Row gutter={[16, 18]}>
                       {items?.length > 0 ? (
                         items.map((item) => {
-                          const { id, uri, createdAt } = item;
-                          const base64Uri = uri.split(",")[1];
-                          const metadata = JSON.parse(atob(base64Uri));
-                          console.log("metadata: ", metadata);
                           return (
-                            <Col key={id} xs={20} sm={10} md={6} lg={4}>
+                            <Col key={item?.id} xs={20} sm={10} md={6} lg={4}>
                               <Card
                                 hoverable
                                 bordered
                                 loading={dataLoading}
-                                actions={[
-                                  <p>{dayjs(createdAt * 1000).fromNow()}</p>
-                                ]}
                                 style={{
                                   cursor: "pointer",
                                   width: "100%",
@@ -524,7 +513,7 @@ export default function Home() {
                                 cover={
                                   <img
                                     alt="item"
-                                    src={metadata?.image}
+                                    src={item?.image}
                                     style={{
                                       marginTop: 10,
                                       width: "100%",
@@ -536,7 +525,7 @@ export default function Home() {
                                 }
                               >
                                 <Card.Meta
-                                  title={metadata?.name}
+                                  title={item?.name}
                                   description={"SuperUnlockable"}
                                 />
                               </Card>
