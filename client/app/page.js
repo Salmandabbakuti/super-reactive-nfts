@@ -16,7 +16,8 @@ import {
   Tabs,
   Row,
   Col,
-  Divider
+  Divider,
+  Progress
 } from "antd";
 import {
   SyncOutlined,
@@ -456,7 +457,7 @@ export default function Home() {
                           <div style={{ textAlign: "center" }}>
                             <h3>Mint an item</h3>
                             <p>Mint a new item and unlock your super powers</p>
-                            <Space.Compact style={{ width: '90%' }}>
+                            <Space.Compact style={{ width: "90%" }}>
                               <Input
                                 type="text"
                                 value={mintToAddress}
@@ -499,36 +500,70 @@ export default function Home() {
                         items.map((item) => {
                           return (
                             <Col key={item?.id} xs={20} sm={10} md={6} lg={4}>
-                              <Card
-                                hoverable
-                                bordered
-                                loading={dataLoading}
-                                style={{
-                                  cursor: "pointer",
-                                  width: "100%",
-                                  marginTop: 14,
-                                  borderRadius: 10,
-                                  border: "1px solid #d9d9d9"
-                                }}
-                                cover={
-                                  <img
-                                    alt="item"
-                                    src={item?.image}
-                                    style={{
-                                      marginTop: 10,
-                                      width: "100%",
-                                      maxHeight: "260px", // You can adjust this value
-                                      objectFit: "contain",
-                                      borderRadius: 10
+                              <a href={`https://testnet.rarible.com/token/polygon/0x18ce4a4d16f1ddfe9dbcf900c49e0316dc47b115:${item?.id}`} target="_blank" rel="noreferrer">
+                                <Card
+                                  hoverable
+                                  bordered
+                                  loading={dataLoading}
+                                  style={{
+                                    cursor: "pointer",
+                                    width: "100%",
+                                    marginTop: 14,
+                                    borderRadius: 10,
+                                    border: "1px solid #d9d9d9"
+                                  }}
+                                  cover={
+                                    <img
+                                      alt="item"
+                                      src={item?.image}
+                                      style={{
+                                        marginTop: 10,
+                                        width: "100%",
+                                        maxHeight: "260px", // You can adjust this value
+                                        objectFit: "contain",
+                                        borderRadius: 10
+                                      }}
+                                    />
+                                  }
+                                >
+                                  <Card.Meta
+                                    title={item?.name}
+                                    description={"SuperUnlockable"}
+                                  />
+                                  <Divider />
+                                  <Statistic
+                                    title="Power"
+                                    value={item?.attributes[0]?.value}
+                                    suffix=" HP"
+                                    groupSeparator=""
+                                    valueStyle={{
+                                      color: "#10bb35",
+                                      fontSize: "1rem"
                                     }}
                                   />
-                                }
-                              >
-                                <Card.Meta
-                                  title={item?.name}
-                                  description={"SuperUnlockable"}
-                                />
-                              </Card>
+
+                                  <Statistic
+                                    title="Speed"
+                                    value={item?.attributes[1]?.value}
+                                    suffix=" Km/h"
+                                    groupSeparator=""
+                                    valueStyle={{
+                                      color: "#1677ff",
+                                      fontSize: "1rem"
+                                    }}
+                                  />
+                                  <Statistic
+                                    title="Age"
+                                    value={item?.attributes[2]?.value}
+                                    suffix=" Secs"
+                                    groupSeparator=""
+                                    valueStyle={{
+                                      color: "#ff4d4f",
+                                      fontSize: "1rem"
+                                    }}
+                                  />
+                                </Card>
+                              </a>
                             </Col>
                           );
                         })
