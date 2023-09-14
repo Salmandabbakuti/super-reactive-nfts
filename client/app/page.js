@@ -28,8 +28,7 @@ import {
   WalletFilled,
   ArrowRightOutlined
 } from "@ant-design/icons";
-import { graphqlClient as client } from "./utils";
-import { GET_TOKENS } from "./utils/graphqlQueries";
+
 import {
   calculateFlowRateInTokenPerMonth,
   calculateFlowRateInWeiPerSecond,
@@ -42,7 +41,7 @@ import styles from "./page.module.css";
 dayjs.extend(relativeTime);
 const contractAddress =
   process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  "0x18Ce4A4D16f1DDFe9dbcf900c49e0316DC47B115";
+  "0xd805D871b1aAcb17F346e2d957aB5d31B383d57C";
 const supportedTokenAddress =
   process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
   "0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f";
@@ -500,7 +499,7 @@ export default function Home() {
                         items.map((item) => {
                           return (
                             <Col key={item?.id} xs={20} sm={10} md={6} lg={4}>
-                              <a href={`https://testnet.rarible.com/token/polygon/0x18ce4a4d16f1ddfe9dbcf900c49e0316dc47b115:${item?.id}`} target="_blank" rel="noreferrer">
+                              <a href={`https://testnet.rarible.com/token/polygon/${contractAddress}:${item?.id}`} target="_blank" rel="noreferrer">
                                 <Card
                                   hoverable
                                   bordered
