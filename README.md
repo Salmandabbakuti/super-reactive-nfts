@@ -1,4 +1,4 @@
-# hardhat-boilerplate
+# Super Unlockable NFTs
 
 This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts with balances.
 
@@ -33,4 +33,15 @@ npx hardhat clean
 
 # show help
 npx hardhat help
+```
+
+### Client App
+
+```shell
+cd client
+
+npm install
+
+# start dev server
+npm run dev
 ```

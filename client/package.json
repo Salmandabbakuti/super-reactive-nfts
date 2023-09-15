@@ -1,6 +1,6 @@
 {
-  "name": "next-antd-boilerplate",
-  "description": "Next.js13 + Ant Design boilerplate",
+  "name": "super-unlockable-client",
+  "description": "Super Unlockable NFTs Client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -16,8 +16,6 @@
     "@ethersproject/units": "^5.7.0",
     "antd": "^5.8.6",
     "dayjs": "^1.11.9",
-    "graphql": "^16.8.0",
-    "graphql-request": "^6.1.0",
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0"

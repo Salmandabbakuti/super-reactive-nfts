@@ -16,8 +16,7 @@ import {
   Tabs,
   Row,
   Col,
-  Divider,
-  Progress
+  Divider
 } from "antd";
 import {
   SyncOutlined,
@@ -545,7 +544,7 @@ export default function Home() {
                                   <Statistic
                                     title="Power"
                                     value={item?.attributes[0]?.value}
-                                    suffix=" HP"
+                                    suffix=" Wei"
                                     groupSeparator=""
                                     valueStyle={{
                                       color: "#10bb35",
@@ -556,7 +555,7 @@ export default function Home() {
                                   <Statistic
                                     title="Speed"
                                     value={item?.attributes[1]?.value}
-                                    suffix=" Km/h"
+                                    suffix=" Wei/Sec"
                                     groupSeparator=""
                                     valueStyle={{
                                       color: "#1677ff",

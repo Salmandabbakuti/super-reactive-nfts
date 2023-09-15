@@ -8,31 +8,6 @@ task("deploy", "Deploys Contract", async () => {
   console.log("contract deployed at:", contract.address);
 });
 
-task("getFlowInfo", "Gets Flow Info from contract", async () => {
-  const contractFactory = await ethers.getContractFactory("SuperUnlockable");
-  const contract = await contractFactory.attach("0xd805D871b1aAcb17F346e2d957aB5d31B383d57C");
-  const { lastUpdated, flowRate, deposit, owedDeposit } = await contract.getFlowInfo("0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f", "0x7348943C8d263ea253c0541656c36b88becD77B9", "0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff");
-  console.log("lastUpdated:", lastUpdated.toString());
-  console.log("flowRate:", flowRate.toString());
-  console.log("deposit:", deposit.toString());
-  console.log("owedDeposit:", owedDeposit.toString());
-  // convert deposit to token amount from wei to token
-  const depositInToken = ethers.utils.formatUnits(deposit, 18);
-  console.log("depositInToken:", depositInToken.toString());
-});
-
-task("mint", "Mints tokens to address", async () => {
-  const contractFactory = await ethers.getContractFactory("SuperUnlockable");
-  const contract = await contractFactory.attach("0xd805D871b1aAcb17F346e2d957aB5d31B383d57C");
-  const tx = await contract.mintItem("0x7348943C8d263ea253c0541656c36b88becD77B9");
-  console.log("tx:", tx);
-  await tx.wait();
-  console.log("Minted!");
-});
-
-
-
-
 module.exports = {
   solidity: "0.8.16",
   // defaultNetwork: "local",
