@@ -4,7 +4,7 @@ require('dotenv').config();
 task("deploy", "Deploys Contract", async () => {
   const contractFactory = await ethers.getContractFactory("SuperUnlockable");
   // Constructor arguments: address of the token, required deposit to unlock minting
-  const contract = await contractFactory.deploy("0xd04383398dd2426297da660f9cca3d439af9ce1b", "10000000000000000"); // USDCx token on Base mainnet and minumum deposit of 0.01 USDCx
+  const contract = await contractFactory.deploy("0x4db26c973fae52f43bd96a8776c2bf1b0dc29556", "10000000000000000"); // USDbCx token on Base mainnet and minumum deposit of 0.01 USDbCx
   await contract.deployed();
   console.log("contract deployed at:", contract.address);
 });

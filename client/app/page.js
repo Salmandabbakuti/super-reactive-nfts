@@ -40,10 +40,10 @@ import styles from "./page.module.css";
 dayjs.extend(relativeTime);
 const contractAddress =
   process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  "0xd805D871b1aAcb17F346e2d957aB5d31B383d57C";
+  "0xdAF74831881645Fd64Cab0673f4B8b79c36d232d";
 const supportedTokenAddress =
   process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
-  "0xd04383398dd2426297da660f9cca3d439af9ce1b";
+  "0x4dB26C973FaE52f43Bd96A8776C2bf1b0DC29556";
 
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
@@ -344,7 +344,7 @@ export default function Home() {
                                     <p>
                                       *You are Streaming{" "}
                                       <b>
-                                        {updatedFlowRateInput || 0} fDAIx/month
+                                        {updatedFlowRateInput || 0} USDbCx/month
                                       </b>{" "}
                                       to contract
                                     </p>
@@ -392,7 +392,7 @@ export default function Home() {
                                   />
                                   <p>
                                     *You are Streaming{" "}
-                                    <b>{flowRateInput || 0} fDAIx/month</b> to
+                                    <b>{flowRateInput || 0} USDbCx/month</b> to
                                     contract
                                   </p>
                                 </>
@@ -421,7 +421,7 @@ export default function Home() {
                                 color: "#10bb35",
                                 fontSize: "1.5rem"
                               }}
-                              value={`${amountStreamedSinceLastUpdate} fDAIx`}
+                              value={`${amountStreamedSinceLastUpdate} USDbCx`}
                               precision={9}
                             />
                           </div>
@@ -455,7 +455,7 @@ export default function Home() {
                           </Space>
                           <h3 style={{ textAlign: "center" }}>
                             {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
-                            fDAIx/month
+                            USDbCx/month
                           </h3>
                           <Divider orientation="right" plain>
                             Last Updated:{" "}

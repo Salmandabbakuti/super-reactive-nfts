@@ -32,7 +32,7 @@ export default function SiteLayout({ children }) {
           ©{new Date().getFullYear()} Salman Dabbakuti. Powered by
           TheGraph & Ant Design
         </a>
-        <p style={{ fontSize: "12px" }}>v0.27.0</p>
+        <p style={{ fontSize: "12px" }}>v0.28.0</p>
       </Footer>
     </Layout>
   );

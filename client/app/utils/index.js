@@ -20,7 +20,7 @@ const cfav1ForwarderABI = [
 ];
 
 const cfav1ForwarderContractAddress = process.env.NEXT_PUBLIC_CFAV1_FORWARDER_ADDRESS || "0xcfA132E353cB4E398080B9700609bb008eceB125";
-const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xd805D871b1aAcb17F346e2d957aB5d31B383d57C";
+const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xdAF74831881645Fd64Cab0673f4B8b79c36d232d";
 
 export const contract = new Contract(contractAddress, contractABI);
 export const cfav1ForwarderContract = new Contract(cfav1ForwarderContractAddress, cfav1ForwarderABI);
