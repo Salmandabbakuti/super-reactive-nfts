@@ -23,6 +23,12 @@ module.exports = {
     base: {
       url: "https://mainnet.base.org",
       accounts: [process.env.PRIVATE_KEY],
+      gasPrice: 100000000
+    },
+    baseGoerli: {
+      url: "https://goerli.base.org",
+      accounts: [process.env.PRIVATE_KEY],
+      gasPrice: 1000000000
     }
   },
   etherscan: {
