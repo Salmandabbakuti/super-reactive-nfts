@@ -43,7 +43,7 @@ const contractAddress =
   "0xd805D871b1aAcb17F346e2d957aB5d31B383d57C";
 const supportedTokenAddress =
   process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
-  "0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f";
+  "0xd04383398dd2426297da660f9cca3d439af9ce1b";
 
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
@@ -70,11 +70,11 @@ export default function Home() {
     try {
       const currentProvider = new Web3Provider(window.ethereum);
       const { chainId } = await currentProvider.getNetwork();
-      if (chainId !== 80001) {
+      if (chainId !== 8453) {
         try {
           await window.ethereum.request({
             method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x13881" }]
+            params: [{ chainId: "0x2105" }]
           });
         } catch (switchError) {
           if (switchError.code === 4902) {
@@ -83,25 +83,28 @@ export default function Home() {
                 method: "wallet_addEthereumChain",
                 params: [
                   {
-                    chainId: "0x13881",
-                    chainName: "Polygon Mumbai",
+                    chainId: "0x2105",
+                    chainName: "Base Mainnet",
                     nativeCurrency: {
-                      name: "Matic",
-                      symbol: "MATIC",
+                      name: "ETH",
+                      symbol: "ETH",
                       decimals: 18
                     },
-                    rpcUrls: ["https://rpc-mumbai.maticvigil.com/"],
-                    blockExplorerUrls: ["https://mumbai.polygonscan.com/"]
+                    rpcUrls: [
+                      "https://mainnet.base.org",
+                      "https://base.meowrpc.com"
+                    ],
+                    blockExplorerUrls: ["https://basescan.org"]
                   }
                 ]
               });
             } catch (addError) {
-              console.error("Failed to add Polygon Mumbai:", addError);
-              return message.error("Failed to add Polygon Mumbai");
+              console.error("Failed to add Base Mainnet:", addError);
+              return message.error("Failed to add Base Mainnet");
             }
           } else {
-            console.error("Failed to switch to Polygon Mumbai:", switchError);
-            return message.error("Failed to switch to Polygon Mumbai");
+            console.error("Failed to switch to Base Mainnet:", switchError);
+            return message.error("Failed to switch to Base Mainnet");
           }
         }
       }
