@@ -25,7 +25,8 @@ import {
   PlusCircleOutlined,
   WalletOutlined,
   WalletFilled,
-  ArrowRightOutlined
+  ArrowRightOutlined,
+  ExportOutlined
 } from "@ant-design/icons";
 
 import {
@@ -346,7 +347,14 @@ export default function Home() {
                                       <b>
                                         {updatedFlowRateInput || 0} USDbCx/month
                                       </b>{" "}
-                                      to contract
+                                      to{" "}
+                                      <a
+                                        href={`https://basescan.org/address/${supportedTokenAddress}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        Contract
+                                      </a>
                                     </p>
                                   </>
                                 }
@@ -392,8 +400,14 @@ export default function Home() {
                                   />
                                   <p>
                                     *You are Streaming{" "}
-                                    <b>{flowRateInput || 0} USDbCx/month</b> to
-                                    contract
+                                    <b>{flowRateInput || 0} USDbCx/month</b> to{" "}
+                                    <a
+                                      href={`https://basescan.org/address/${supportedTokenAddress}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      Contract
+                                    </a>
                                   </p>
                                 </>
                               }
@@ -428,7 +442,18 @@ export default function Home() {
                           <Space>
                             <Card>
                               <Statistic
-                                title="Sender (You)"
+                                title={
+                                  <Space>
+                                    Sender (You)
+                                    <a
+                                      href={`https://basescan.org/address/${stream?.sender}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      <ExportOutlined title="View on Basescan" />
+                                    </a>
+                                  </Space>
+                                }
                                 value={
                                   stream?.sender?.slice(0, 5) +
                                   "..." +
@@ -444,7 +469,18 @@ export default function Home() {
                             />
                             <Card>
                               <Statistic
-                                title="Receiver (Contract)"
+                                title={
+                                  <Space>
+                                    Receiver (Contract)
+                                    <a
+                                      href={`https://basescan.org/address/${stream?.receiver}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      <ExportOutlined title="View on Basescan" />
+                                    </a>
+                                  </Space>
+                                }
                                 value={
                                   stream?.receiver?.slice(0, 5) +
                                   "..." +
@@ -464,6 +500,24 @@ export default function Home() {
                           <div style={{ textAlign: "center" }}>
                             <h3>Mint an item</h3>
                             <p>Mint a new item and unlock your super powers</p>
+                            <p>
+                              *You can mint an item if you have streamed atleast{" "}
+                              <b>
+                                0.01{" "}
+                                <a
+                                  href={`https://basescan.org/token/${supportedTokenAddress}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  USDbCx
+                                </a>
+                              </b>{" "}
+                              to contract
+                            </p>
+                            <p>
+                              *Your Item's attributes will be dynamic based on
+                              your stream
+                            </p>
                             <Space.Compact style={{ width: "90%" }}>
                               <Input
                                 type="text"
@@ -484,10 +538,35 @@ export default function Home() {
                           </div>
                         </>
                       ) : (
-                        <p>
-                          No stream found. Open a stream to contract and unlock
-                          your super powers
-                        </p>
+                        <Empty
+                          description={
+                            <>
+                              <b>
+                                No stream found. Open a stream to contract and
+                                unlock your super powers{" "}
+                              </b>
+                              <p>
+                                *You can mint an item if you have streamed
+                                atleast{" "}
+                                <b>
+                                  0.01{" "}
+                                  <a
+                                    href={`https://basescan.org/token/${supportedTokenAddress}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    USDbCx
+                                  </a>
+                                </b>{" "}
+                                to contract
+                              </p>
+                              <p>
+                                *Your Item's attributes will be dynamic based on
+                                your stream
+                              </p>
+                            </>
+                          }
+                        />
                       )}
                     </Card>
                   </div>
@@ -509,74 +588,80 @@ export default function Home() {
                         items.map((item) => {
                           return (
                             <Col key={item?.id} xs={20} sm={10} md={6} lg={4}>
-                              <a
-                                href={`https://testnet.rarible.com/token/polygon/${contractAddress}:${item?.id}`}
-                                target="_blank"
-                                rel="noreferrer"
+                              <Card
+                                hoverable
+                                bordered
+                                loading={dataLoading}
+                                style={{
+                                  // cursor: "pointer",
+                                  width: "100%",
+                                  marginTop: 14,
+                                  borderRadius: 10,
+                                  border: "1px solid #d9d9d9"
+                                }}
+                                cover={
+                                  <img
+                                    alt="item"
+                                    src={item?.image}
+                                    style={{
+                                      marginTop: 10,
+                                      width: "100%",
+                                      maxHeight: "260px", // You can adjust this value
+                                      objectFit: "contain",
+                                      borderRadius: 10
+                                    }}
+                                  />
+                                }
                               >
-                                <Card
-                                  hoverable
-                                  bordered
-                                  loading={dataLoading}
-                                  style={{
-                                    cursor: "pointer",
-                                    width: "100%",
-                                    marginTop: 14,
-                                    borderRadius: 10,
-                                    border: "1px solid #d9d9d9"
-                                  }}
-                                  cover={
-                                    <img
-                                      alt="item"
-                                      src={item?.image}
-                                      style={{
-                                        marginTop: 10,
-                                        width: "100%",
-                                        maxHeight: "260px", // You can adjust this value
-                                        objectFit: "contain",
-                                        borderRadius: 10
-                                      }}
-                                    />
+                                <Card.Meta
+                                  title={
+                                    <Space>
+                                      {item?.name}
+                                      <a
+                                        href={`https://opensea.io/assets/base/${contractAddress}/${item?.id}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        <ExportOutlined title="View on Opensea" />
+                                      </a>
+                                    </Space>
                                   }
-                                >
-                                  <Card.Meta
-                                    title={item?.name}
-                                    description={"SuperUnlockable"}
-                                  />
-                                  <Divider />
-                                  <Statistic
-                                    title="Power"
-                                    value={item?.attributes[0]?.value}
-                                    suffix=" Wei"
-                                    groupSeparator=""
-                                    valueStyle={{
-                                      color: "#10bb35",
-                                      fontSize: "1rem"
-                                    }}
-                                  />
+                                  description={"SuperUnlockable"}
+                                />
+                                <Divider />
+                                <p>Attributes</p>
+                                <Statistic
+                                  title="Power"
+                                  value={item?.attributes[0]?.value}
+                                  suffix=" Wei"
+                                  groupSeparator=""
+                                  valueStyle={{
+                                    color: "#10bb35",
+                                    fontSize: "1rem"
+                                  }}
+                                />
 
-                                  <Statistic
-                                    title="Speed"
-                                    value={item?.attributes[1]?.value}
-                                    suffix=" Wei/Sec"
-                                    groupSeparator=""
-                                    valueStyle={{
-                                      color: "#1677ff",
-                                      fontSize: "1rem"
-                                    }}
-                                  />
-                                  <Statistic
-                                    title="Age"
-                                    value={item?.attributes[2]?.value}
-                                    suffix=" Secs"
-                                    groupSeparator=""
-                                    valueStyle={{
-                                      color: "#ff4d4f",
-                                      fontSize: "1rem"
-                                    }}
-                                  />
-                                </Card>
-                              </a>
+                                <Statistic
+                                  title="Speed"
+                                  value={item?.attributes[1]?.value}
+                                  suffix=" Wei/Sec"
+                                  groupSeparator=""
+                                  valueStyle={{
+                                    color: "#1677ff",
+                                    fontSize: "1rem"
+                                  }}
+                                />
+                                <Statistic
+                                  title="Age"
+                                  value={item?.attributes[2]?.value}
+                                  suffix=" Secs"
+                                  groupSeparator=""
+                                  valueStyle={{
+                                    color: "#ff4d4f",
+                                    fontSize: "1rem"
+                                  }}
+                                />
+                              </Card>
                             </Col>
                           );
                         })
