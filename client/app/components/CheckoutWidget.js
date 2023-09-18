@@ -1,33 +1,9 @@
 import { useMemo } from "react";
-import { useWeb3Modal, Web3Modal } from "@web3modal/react";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { base, baseGoerli } from "wagmi/chains";
+import { useWeb3Modal } from "@web3modal/react";
 import { Button, Badge } from "antd";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import SuperfluidWidget from "@superfluid-finance/widget";
-import {
-  EthereumClient,
-  w3mConnectors,
-  w3mProvider
-} from "@web3modal/ethereum";
 import { supportedTokenAddress, contractAddress } from "@/app/utils";
-
-const projectId = "952483bf7a0f5ace4c40eb53967f1368";
-const supportedNetworks = [base, baseGoerli];
-
-const { publicClient } = configureChains(supportedNetworks, [
-  w3mProvider({ projectId })
-]);
-
-const wagmiConfig = createConfig({
-  autoConnect: false,
-  connectors: w3mConnectors({
-    projectId,
-    chains: supportedNetworks
-  }),
-  publicClient
-});
-const ethereumClient = new EthereumClient(wagmiConfig, supportedNetworks);
 
 const productDetails = {
   name: "SuperUnlockable",
@@ -73,29 +49,24 @@ export default function CheckoutWidget() {
   );
 
   return (
-    <>
-      <WagmiConfig config={wagmiConfig}>
-        <SuperfluidWidget
-          productDetails={productDetails}
-          paymentDetails={paymentDetails}
-          type="drawer"
-          walletManager={walletManager}
-          eventListeners={eventListeners}
-        >
-          {({ openModal }) => (
-            <Badge dot status="processing">
-              <Button
-                type="primary"
-                shape="circle"
-                title="Create new stream"
-                icon={<PlusCircleOutlined />}
-                onClick={() => openModal()}
-              />
-            </Badge>
-          )}
-        </SuperfluidWidget>
-      </WagmiConfig>
-      <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
-    </>
+    <SuperfluidWidget
+      productDetails={productDetails}
+      paymentDetails={paymentDetails}
+      type="drawer"
+      walletManager={walletManager}
+      eventListeners={eventListeners}
+    >
+      {({ openModal }) => (
+        <Badge dot status="processing">
+          <Button
+            type="primary"
+            shape="circle"
+            title="Create new stream"
+            icon={<PlusCircleOutlined />}
+            onClick={() => openModal()}
+          />
+        </Badge>
+      )}
+    </SuperfluidWidget>
   );
 }

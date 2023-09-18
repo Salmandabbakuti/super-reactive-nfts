@@ -1,4 +1,5 @@
-import SiteLayout from "./components/SiteLayout.js";
+import SiteLayout from "./components/SiteLayout";
+import Web3Provider from "./components/Web3Provider";
 import "./globals.css";
 
 export const metadata = {
@@ -10,9 +11,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <SiteLayout>
-          {children}
-        </SiteLayout>
+        <Web3Provider>
+          <SiteLayout>
+            {children}
+          </SiteLayout>
+        </Web3Provider>
       </body>
     </html>
   );
