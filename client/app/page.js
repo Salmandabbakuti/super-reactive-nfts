@@ -46,6 +46,8 @@ const supportedTokenAddress =
   process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
   "0x4dB26C973FaE52f43Bd96A8776C2bf1b0DC29556";
 
+const supportedTokenSymbol = process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_SYMBOL || "USDbCx";
+
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
   const [stream, setStream] = useState(null);
@@ -345,7 +347,7 @@ export default function Home() {
                                     <p>
                                       *You are Streaming{" "}
                                       <b>
-                                        {updatedFlowRateInput || 0} USDbCx/month
+                                        {updatedFlowRateInput || 0} {supportedTokenSymbol}/month
                                       </b>{" "}
                                       to{" "}
                                       <a
@@ -400,7 +402,7 @@ export default function Home() {
                                   />
                                   <p>
                                     *You are Streaming{" "}
-                                    <b>{flowRateInput || 0} USDbCx/month</b> to{" "}
+                                    <b>{flowRateInput || 0} {supportedTokenSymbol}/month</b> to{" "}
                                     <a
                                       href={`https://basescan.org/address/${contractAddress}`}
                                       target="_blank"
@@ -435,7 +437,7 @@ export default function Home() {
                                 color: "#10bb35",
                                 fontSize: "1.5rem"
                               }}
-                              value={`${amountStreamedSinceLastUpdate} USDbCx`}
+                              value={`${amountStreamedSinceLastUpdate} ${supportedTokenSymbol}`}
                               precision={9}
                             />
                           </div>
@@ -491,7 +493,7 @@ export default function Home() {
                           </Space>
                           <h3 style={{ textAlign: "center" }}>
                             {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
-                            USDbCx/month
+                            {supportedTokenSymbol}/month
                           </h3>
                           <Divider orientation="right" plain>
                             Last Updated:{" "}
@@ -509,7 +511,7 @@ export default function Home() {
                                   target="_blank"
                                   rel="noreferrer"
                                 >
-                                  USDbCx
+                                  {supportedTokenSymbol}
                                 </a>
                               </b>{" "}
                               to contract
@@ -555,7 +557,7 @@ export default function Home() {
                                     target="_blank"
                                     rel="noreferrer"
                                   >
-                                    USDbCx
+                                    {supportedTokenSymbol}
                                   </a>
                                 </b>{" "}
                                 to contract
