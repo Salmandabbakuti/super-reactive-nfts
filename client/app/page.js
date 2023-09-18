@@ -16,21 +16,23 @@ import {
   Tabs,
   Row,
   Col,
-  Divider,
-  Badge
+  Divider
 } from "antd";
 import {
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  PlusCircleOutlined,
   WalletOutlined,
   WalletFilled,
   ArrowRightOutlined,
   ExportOutlined
 } from "@ant-design/icons";
+import CheckoutWidget from "./components/CheckoutWidget";
 
 import {
+  contractAddress,
+  supportedTokenAddress,
+  supportedTokenSymbol,
   calculateFlowRateInTokenPerMonth,
   calculateFlowRateInWeiPerSecond,
   calculateTotalStreamedSinceLastUpdate,
@@ -40,15 +42,6 @@ import {
 import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
-const contractAddress =
-  process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  "0xdAF74831881645Fd64Cab0673f4B8b79c36d232d";
-const supportedTokenAddress =
-  process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
-  "0x4dB26C973FaE52f43Bd96A8776C2bf1b0DC29556";
-
-const supportedTokenSymbol =
-  process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_SYMBOL || "USDbCx";
 
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
@@ -57,7 +50,6 @@ export default function Home() {
   const [provider, setProvider] = useState(null);
   const [updatedFlowRateInput, setUpdatedFlowRateInput] = useState(0);
   const [loading, setLoading] = useState({ connect: false });
-  const [flowRateInput, setFlowRateInput] = useState(0);
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
   const [
@@ -135,31 +127,6 @@ export default function Home() {
     setStream(null);
     setProvider(null);
     message.success("Wallet disconnected");
-  };
-
-  const handleCreateStreamToContract = async (flowRate) => {
-    if (!account || !provider)
-      return message.error("Please connect wallet first");
-    if (!flowRate) return message.error("Please enter flow rate");
-    try {
-      const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
-      console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
-      const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract
-        .connect(signer)
-        .createFlow(
-          supportedTokenAddress,
-          account,
-          contractAddress,
-          flowRateInWeiPerSecond,
-          "0x"
-        );
-      await tx.wait();
-      message.success("Stream opened to contract successfully");
-    } catch (err) {
-      message.error("Failed to open stream to contract");
-      console.error("failed to open stream to contract: ", err);
-    }
   };
 
   const handleUpdateStreamToContract = async (flowRate) => {
@@ -390,50 +357,7 @@ export default function Home() {
                               </Popconfirm>
                             </>
                           ) : (
-                            <Popconfirm
-                              title={
-                                <>
-                                  <h3>Enter flow rate</h3>
-                                  <Input
-                                    type="number"
-                                    placeholder="Flowrate in no. of tokens"
-                                    addonAfter="/month"
-                                    value={flowRateInput}
-                                    onChange={(e) =>
-                                      setFlowRateInput(e.target.value)
-                                    }
-                                  />
-                                  <p>
-                                    *You are Streaming{" "}
-                                    <b>
-                                      {flowRateInput || 0}{" "}
-                                      {supportedTokenSymbol}/month
-                                    </b>{" "}
-                                    to{" "}
-                                    <a
-                                      href={`https://basescan.org/address/${contractAddress}`}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                    >
-                                      Contract
-                                    </a>
-                                  </p>
-                                </>
-                              }
-                              onConfirm={() =>
-                                handleCreateStreamToContract(flowRateInput)
-                              }
-                            >
-                              <Badge
-                                dot status="processing">
-                                <Button
-                                  type="primary"
-                                  shape="circle"
-                                  title="Create new stream"
-                                  icon={<PlusCircleOutlined />}
-                                />
-                              </Badge>
-                            </Popconfirm>
+                            <CheckoutWidget />
                           )}
                         </Space>
                       }

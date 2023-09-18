@@ -14,11 +14,15 @@
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/units": "^5.7.0",
+    "@superfluid-finance/widget": "^0.4.0",
+    "@web3modal/ethereum": "^2.7.1",
+    "@web3modal/react": "^2.7.1",
     "antd": "^5.8.6",
     "dayjs": "^1.11.9",
     "next": "13.4.19",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "wagmi": "^1.4.2"
   },
   "devDependencies": {
     "encoding": "^0.1.13",
