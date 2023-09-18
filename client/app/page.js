@@ -16,7 +16,8 @@ import {
   Tabs,
   Row,
   Col,
-  Divider
+  Divider,
+  Badge
 } from "antd";
 import {
   SyncOutlined,
@@ -46,7 +47,8 @@ const supportedTokenAddress =
   process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
   "0x4dB26C973FaE52f43Bd96A8776C2bf1b0DC29556";
 
-const supportedTokenSymbol = process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_SYMBOL || "USDbCx";
+const supportedTokenSymbol =
+  process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_SYMBOL || "USDbCx";
 
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
@@ -324,7 +326,7 @@ export default function Home() {
                         <Space>
                           <Button
                             title="Refresh"
-                            type="primary"
+                            type="default"
                             shape="circle"
                             icon={<SyncOutlined spin={dataLoading} />}
                             onClick={getStreamToContract}
@@ -347,7 +349,8 @@ export default function Home() {
                                     <p>
                                       *You are Streaming{" "}
                                       <b>
-                                        {updatedFlowRateInput || 0} {supportedTokenSymbol}/month
+                                        {updatedFlowRateInput || 0}{" "}
+                                        {supportedTokenSymbol}/month
                                       </b>{" "}
                                       to{" "}
                                       <a
@@ -374,7 +377,7 @@ export default function Home() {
                                 />
                               </Popconfirm>
                               <Popconfirm
-                                title="Are you sure to delete?"
+                                title="Are you sure to delete this stream?"
                                 onConfirm={handleDeleteStream}
                               >
                                 <Button
@@ -402,7 +405,11 @@ export default function Home() {
                                   />
                                   <p>
                                     *You are Streaming{" "}
-                                    <b>{flowRateInput || 0} {supportedTokenSymbol}/month</b> to{" "}
+                                    <b>
+                                      {flowRateInput || 0}{" "}
+                                      {supportedTokenSymbol}/month
+                                    </b>{" "}
+                                    to{" "}
                                     <a
                                       href={`https://basescan.org/address/${contractAddress}`}
                                       target="_blank"
@@ -417,12 +424,15 @@ export default function Home() {
                                 handleCreateStreamToContract(flowRateInput)
                               }
                             >
-                              <Button
-                                type="primary"
-                                shape="circle"
-                                title="Create new stream"
-                                icon={<PlusCircleOutlined />}
-                              />
+                              <Badge
+                                dot status="processing">
+                                <Button
+                                  type="primary"
+                                  shape="circle"
+                                  title="Create new stream"
+                                  icon={<PlusCircleOutlined />}
+                                />
+                              </Badge>
                             </Popconfirm>
                           )}
                         </Space>
@@ -582,6 +592,7 @@ export default function Home() {
                     <h1 style={{ textAlign: "center" }}>Items</h1>
                     <Button
                       type="primary"
+                      shape="circle"
                       icon={<SyncOutlined spin={dataLoading} />}
                       onClick={getItems}
                     />
