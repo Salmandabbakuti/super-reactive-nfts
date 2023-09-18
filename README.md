@@ -1,8 +1,6 @@
 # Super Unlockable NFTs
 
-> Unlock NFTs by streaming tokens to a contract.
-
-Welcome to SuperUnlockable, where you can mint unique in-game items that reflect your ever-evolving powers and abilities based on your financial streaming activities. With SuperUnlockable, you can showcase your financial prowess and level up your character in the world of decentralized gaming. As you meet the required streaming thresholds, you'll gain access to mint these exceptional in-game items. The key? Your item's attributes dynamically respond to your streaming activity. The more you stream, the mightier your in-game item becomes.
+Unleash your money-streaming powers with SuperUnlockable collection. You can showcase your financial prowess and level up your character in the world of decentralized gaming. As you meet the required streaming thresholds, you'll gain access to mint these exceptional in-game items. The key? Your item's attributes dynamically respond to your streaming activity. The more you stream, the mightier your in-game item becomes. Wanna Try it out? [SuperUnlockable Dapp](https://superunlockable-develop.vercel.app/)
 
 > Note: To mint/unlock NFTs, you'll need to stream a minimum of 0.01 [`USDbCx`](https://basescan.org/token/0x4db26c973fae52f43bd96a8776c2bf1b0dc29556) to the [SuperUnlockable Contract](https://basescan.org/address/0xdaf74831881645fd64cab0673f4b8b79c36d232d) on [Base mainnet](https://base.org). You can get `USDbCx` by depositing `USDbC` into your account and then wrapping it to `USDbCx` on the [Superfluid App](https://app.superfluid.finance/wrap).
 
@@ -31,6 +29,8 @@ Your SuperUnlockable item attributes are determined by your streaming data:
 ![Items](https://github.com/Salmandabbakuti/super-unlockable-nfts/assets/29351207/7d6c464a-f8f6-491a-ad5d-59fb37e1f8f4)
 
 ## Getting Started
+
+You can try out the demo [here](https://superunlockable-develop.vercel.app/).
 
 > Copy the `.env.example` file to `.env` and fill in the required environment variables.
 
