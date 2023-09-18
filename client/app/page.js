@@ -349,7 +349,7 @@ export default function Home() {
                                       </b>{" "}
                                       to{" "}
                                       <a
-                                        href={`https://basescan.org/address/${supportedTokenAddress}`}
+                                        href={`https://basescan.org/address/${contractAddress}`}
                                         target="_blank"
                                         rel="noreferrer"
                                       >
@@ -402,7 +402,7 @@ export default function Home() {
                                     *You are Streaming{" "}
                                     <b>{flowRateInput || 0} USDbCx/month</b> to{" "}
                                     <a
-                                      href={`https://basescan.org/address/${supportedTokenAddress}`}
+                                      href={`https://basescan.org/address/${contractAddress}`}
                                       target="_blank"
                                       rel="noreferrer"
                                     >
