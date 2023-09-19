@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { useWeb3Modal } from "@web3modal/react";
 import { Button, Badge } from "antd";
-import { PlusCircleOutlined } from "@ant-design/icons";
 import SuperfluidWidget from "@superfluid-finance/widget";
 import { supportedTokenAddress, contractAddress } from "@/app/utils";
 
@@ -9,7 +8,8 @@ const productDetails = {
   name: "SuperUnlockable",
   description:
     "Unleash your money-streaming powers with SuperUnlockable. Open a stream to contract and unlock your super powers today!",
-  imageURI: "",
+  imageURI:
+    "https://ipfs.io/ipfs/QmPDYdFGZCEKXgsVmVq4CMH9JoPCYqyBfD2ELEg53LNd5G",
   successText: "You have successfully opnen a stream to contract"
 };
 
@@ -66,8 +66,9 @@ const themeOptions = {
   }
 };
 
-export default function CheckoutWidget() {
+export default function CheckoutWidget({ title, icon }) {
   const { open, isOpen, setDefaultChain } = useWeb3Modal();
+
   const walletManager = useMemo(
     () => ({
       open: ({ chain }) => {
@@ -103,8 +104,8 @@ export default function CheckoutWidget() {
           <Button
             type="primary"
             shape="circle"
-            title="Create new stream"
-            icon={<PlusCircleOutlined />}
+            title={title}
+            icon={icon}
             onClick={() => openModal()}
           />
         </Badge>

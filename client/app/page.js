@@ -27,7 +27,8 @@ import {
   DeleteOutlined,
   WalletFilled,
   ArrowRightOutlined,
-  ExportOutlined
+  ExportOutlined,
+  PlusCircleOutlined
 } from "@ant-design/icons";
 import CheckoutWidget from "./components/CheckoutWidget";
 
@@ -36,7 +37,6 @@ import {
   supportedTokenAddress,
   supportedTokenSymbol,
   calculateFlowRateInTokenPerMonth,
-  calculateFlowRateInWeiPerSecond,
   calculateTotalStreamedSinceLastUpdate,
   cfav1ForwarderContract,
   contract
@@ -49,7 +49,6 @@ export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
   const [stream, setStream] = useState(null);
   const [provider, setProvider] = useState(null);
-  const [updatedFlowRateInput, setUpdatedFlowRateInput] = useState(0);
   const [loading, setLoading] = useState({ connect: false });
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
@@ -78,31 +77,6 @@ export default function Home() {
     setStream(null);
     setProvider(null);
     message.success("Wallet disconnected");
-  };
-
-  const handleUpdateStreamToContract = async (flowRate) => {
-    if (!account || !cfav1ForwarderContract)
-      return message.error("Please connect wallet first");
-    if (!flowRate) return message.error("Please enter new flow rate");
-    try {
-      const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
-      console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
-      const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract
-        .connect(signer)
-        .updateFlow(
-          supportedTokenAddress,
-          account,
-          contractAddress,
-          flowRateInWeiPerSecond,
-          "0x"
-        );
-      await tx.wait();
-      message.success("Stream updated successfully");
-    } catch (err) {
-      message.error("Failed to update stream");
-      console.error("failed to update stream: ", err);
-    }
   };
 
   const handleDeleteStream = async () => {
@@ -260,49 +234,7 @@ export default function Home() {
                         />
                         {stream ? (
                           <>
-                            <Popconfirm
-                              title={
-                                <>
-                                  <h3>Enter new flow rate</h3>
-                                  <Input
-                                    type="number"
-                                    placeholder="Flowrate in no. of tokens"
-                                    addonAfter="/month"
-                                    value={updatedFlowRateInput}
-                                    onChange={(e) =>
-                                      setUpdatedFlowRateInput(e.target.value)
-                                    }
-                                  />
-                                  <p>
-                                    *You are Streaming{" "}
-                                    <b>
-                                      {updatedFlowRateInput || 0}{" "}
-                                      {supportedTokenSymbol}/month
-                                    </b>{" "}
-                                    to{" "}
-                                    <a
-                                      href={`https://basescan.org/address/${contractAddress}`}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                    >
-                                      Contract
-                                    </a>
-                                  </p>
-                                </>
-                              }
-                              onConfirm={() =>
-                                handleUpdateStreamToContract(
-                                  updatedFlowRateInput
-                                )
-                              }
-                            >
-                              <Button
-                                title="Update"
-                                icon={<EditOutlined />}
-                                type="primary"
-                                shape="circle"
-                              />
-                            </Popconfirm>
+                            <CheckoutWidget title={"Update"} icon={<EditOutlined />} />
                             <Popconfirm
                               title="Are you sure to delete this stream?"
                               onConfirm={handleDeleteStream}
@@ -317,7 +249,7 @@ export default function Home() {
                             </Popconfirm>
                           </>
                         ) : (
-                          <CheckoutWidget />
+                          <CheckoutWidget title={"Open Stream"} icon={<PlusCircleOutlined />} />
                         )}
                       </Space>
                     }
