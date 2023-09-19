@@ -61,18 +61,21 @@ export default function Home() {
   const { disconnect } = useDisconnect();
   const { open, setDefaultChain } = useWeb3Modal();
 
-  const handleConnectWallet = async () => {
+  const handleWalletConnection = async () => {
     setLoading({ connect: true });
-    if (isConnected) {
+    try {
+      if (isConnected) return disconnectWallet();
+      await open();
+      setDefaultChain(base);
+    } catch (err) {
+      console.error("failed to connect wallet: ", err);
+      message.error("Failed to connect wallet");
+    } finally {
       setLoading({ connect: false });
-      return handleDisconnectWallet();
     }
-    await open();
-    setDefaultChain(base);
-    setLoading({ connect: false });
   };
 
-  const handleDisconnectWallet = async () => {
+  const disconnectWallet = () => {
     disconnect();
     setStream(null);
     setProvider(null);
@@ -198,7 +201,7 @@ export default function Home() {
     <div>
       <Button
         type="primary"
-        onClick={handleConnectWallet}
+        onClick={handleWalletConnection}
         icon={<WalletFilled />}
         loading={loading?.connect}
       >
