@@ -25,6 +25,47 @@ const paymentDetails = {
   ]
 };
 
+const themeOptions = {
+  typography: {
+    fontFamily: "'Noto Sans', 'sans-serif'"
+  },
+  palette: {
+    mode: "light",
+    primary: {
+      main: "#1DB227"
+    },
+    secondary: {
+      main: "#fff"
+    }
+  },
+  shape: {
+    borderRadius: 30
+  },
+  components: {
+    MuiStepIcon: {
+      styleOverrides: {
+        text: {
+          fill: "#fff"
+        }
+      }
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 25
+        }
+      }
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 25
+        }
+      }
+    }
+  }
+};
+
 export default function CheckoutWidget() {
   const { open, isOpen, setDefaultChain } = useWeb3Modal();
   const walletManager = useMemo(
@@ -55,6 +96,7 @@ export default function CheckoutWidget() {
       type="drawer"
       walletManager={walletManager}
       eventListeners={eventListeners}
+      theme={themeOptions}
     >
       {({ openModal }) => (
         <Badge dot status="processing">
