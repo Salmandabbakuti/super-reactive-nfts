@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useWeb3Modal } from "@web3modal/react";
 import { useAccount, useDisconnect } from "wagmi";
-import { base, polygonMumbai } from "wagmi/chains";
+import { base } from "wagmi/chains";
 import {
   Button,
   Input,
@@ -68,7 +68,7 @@ export default function Home() {
       return handleDisconnectWallet();
     }
     await open();
-    setDefaultChain(polygonMumbai);
+    setDefaultChain(base);
     setLoading({ connect: false });
   };
 
