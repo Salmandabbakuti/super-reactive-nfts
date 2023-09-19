@@ -1,7 +1,7 @@
 "use client";
 import { Web3Modal } from "@web3modal/react";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { base, baseGoerli } from "wagmi/chains";
+import { base, baseGoerli, polygonMumbai } from "wagmi/chains";
 import {
   EthereumClient,
   w3mConnectors,
@@ -9,7 +9,7 @@ import {
 } from "@web3modal/ethereum";
 
 const projectId = "952483bf7a0f5ace4c40eb53967f1368";
-const supportedNetworks = [base, baseGoerli];
+const supportedNetworks = [base, baseGoerli, polygonMumbai];
 
 const { publicClient } = configureChains(supportedNetworks, [
   w3mProvider({ projectId })

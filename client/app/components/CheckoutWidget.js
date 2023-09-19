@@ -17,7 +17,7 @@ const paymentDetails = {
   paymentOptions: [
     {
       receiverAddress: contractAddress,
-      chainId: 8453,
+      chainId: 80001,
       superToken: {
         address: supportedTokenAddress
       }
