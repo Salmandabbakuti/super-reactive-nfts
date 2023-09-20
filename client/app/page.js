@@ -465,7 +465,7 @@ export default function Home() {
                                 groupSeparator=""
                                 valueStyle={{
                                   color: "#10bb35",
-                                  fontSize: "1rem"
+                                  fontSize: "14px"
                                 }}
                               />
 
@@ -476,7 +476,7 @@ export default function Home() {
                                 groupSeparator=""
                                 valueStyle={{
                                   color: "#1677ff",
-                                  fontSize: "1rem"
+                                  fontSize: "14px"
                                 }}
                               />
                               <Statistic
@@ -486,7 +486,7 @@ export default function Home() {
                                 groupSeparator=""
                                 valueStyle={{
                                   color: "#ff4d4f",
-                                  fontSize: "1rem"
+                                  fontSize: "14px"
                                 }}
                               />
                             </Card>
