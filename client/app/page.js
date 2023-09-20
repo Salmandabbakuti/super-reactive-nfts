@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useWeb3Modal } from "@web3modal/react";
+import { useAccount, useDisconnect } from "wagmi";
+import { base } from "wagmi/chains";
 import {
   Button,
   Input,
@@ -16,22 +19,24 @@ import {
   Tabs,
   Row,
   Col,
-  Divider,
-  Progress
+  Divider
 } from "antd";
 import {
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  PlusCircleOutlined,
-  WalletOutlined,
   WalletFilled,
-  ArrowRightOutlined
+  ArrowRightOutlined,
+  ExportOutlined,
+  PlusCircleOutlined
 } from "@ant-design/icons";
+import CheckoutWidget from "./components/CheckoutWidget";
 
 import {
+  contractAddress,
+  supportedTokenAddress,
+  supportedTokenSymbol,
   calculateFlowRateInTokenPerMonth,
-  calculateFlowRateInWeiPerSecond,
   calculateTotalStreamedSinceLastUpdate,
   cfav1ForwarderContract,
   contract
@@ -39,21 +44,12 @@ import {
 import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);
-const contractAddress =
-  process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  "0xd805D871b1aAcb17F346e2d957aB5d31B383d57C";
-const supportedTokenAddress =
-  process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
-  "0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f";
 
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
   const [stream, setStream] = useState(null);
-  const [account, setAccount] = useState("");
   const [provider, setProvider] = useState(null);
-  const [updatedFlowRateInput, setUpdatedFlowRateInput] = useState(0);
   const [loading, setLoading] = useState({ connect: false });
-  const [flowRateInput, setFlowRateInput] = useState(0);
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
   const [
@@ -61,123 +57,29 @@ export default function Home() {
     setAmountStreamedSinceLastUpdate
   ] = useState(0);
 
-  const handleConnectWallet = async () => {
-    if (!window?.ethereum) {
-      return message.error(
-        "Please install Metamask or any other web3 enabled browser"
-      );
-    }
+  const { address: account, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { open, setDefaultChain } = useWeb3Modal();
+
+  const handleWalletConnection = async () => {
     setLoading({ connect: true });
     try {
-      const currentProvider = new Web3Provider(window.ethereum);
-      const { chainId } = await currentProvider.getNetwork();
-      if (chainId !== 80001) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: "0x13881" }]
-          });
-        } catch (switchError) {
-          if (switchError.code === 4902) {
-            try {
-              await window.ethereum.request({
-                method: "wallet_addEthereumChain",
-                params: [
-                  {
-                    chainId: "0x13881",
-                    chainName: "Polygon Mumbai",
-                    nativeCurrency: {
-                      name: "Matic",
-                      symbol: "MATIC",
-                      decimals: 18
-                    },
-                    rpcUrls: ["https://rpc-mumbai.maticvigil.com/"],
-                    blockExplorerUrls: ["https://mumbai.polygonscan.com/"]
-                  }
-                ]
-              });
-            } catch (addError) {
-              console.error("Failed to add Polygon Mumbai:", addError);
-              return message.error("Failed to add Polygon Mumbai");
-            }
-          } else {
-            console.error("Failed to switch to Polygon Mumbai:", switchError);
-            return message.error("Failed to switch to Polygon Mumbai");
-          }
-        }
-      }
-      const [account1] = await window.ethereum.request({
-        method: "eth_requestAccounts"
-      });
-      console.log("Using account: ", account1);
-      console.log("current chainId:", chainId);
-      const provider = new Web3Provider(window.ethereum);
-      setAccount(account1);
-      setProvider(provider);
-      message.success("Wallet connected");
+      if (isConnected) return disconnectWallet();
+      await open();
+      setDefaultChain(base);
     } catch (err) {
-      console.log("err connecting wallet", err);
-      message.error("Failed to connect wallet!");
+      console.error("failed to connect wallet: ", err);
+      message.error("Failed to connect wallet");
     } finally {
       setLoading({ connect: false });
     }
   };
 
-  const handleDisconnectWallet = async () => {
-    setAccount(null);
+  const disconnectWallet = () => {
+    disconnect();
     setStream(null);
     setProvider(null);
     message.success("Wallet disconnected");
-  };
-
-  const handleCreateStreamToContract = async (flowRate) => {
-    if (!account || !provider)
-      return message.error("Please connect wallet first");
-    if (!flowRate) return message.error("Please enter flow rate");
-    try {
-      const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
-      console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
-      const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract
-        .connect(signer)
-        .createFlow(
-          supportedTokenAddress,
-          account,
-          contractAddress,
-          flowRateInWeiPerSecond,
-          "0x"
-        );
-      await tx.wait();
-      message.success("Stream opened to contract successfully");
-    } catch (err) {
-      message.error("Failed to open stream to contract");
-      console.error("failed to open stream to contract: ", err);
-    }
-  };
-
-  const handleUpdateStreamToContract = async (flowRate) => {
-    if (!account || !cfav1ForwarderContract)
-      return message.error("Please connect wallet first");
-    if (!flowRate) return message.error("Please enter new flow rate");
-    try {
-      const flowRateInWeiPerSecond = calculateFlowRateInWeiPerSecond(flowRate);
-      console.log("flowRateInWeiPerSecond: ", flowRateInWeiPerSecond);
-      const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract
-        .connect(signer)
-        .updateFlow(
-          supportedTokenAddress,
-          account,
-          contractAddress,
-          flowRateInWeiPerSecond,
-          "0x"
-        );
-      await tx.wait();
-      message.success("Stream updated successfully");
-    } catch (err) {
-      message.error("Failed to update stream");
-      console.error("failed to update stream: ", err);
-    }
   };
 
   const handleDeleteStream = async () => {
@@ -269,10 +171,17 @@ export default function Home() {
 
   useEffect(() => {
     if (account) {
+      const provider = new Web3Provider(window.ethereum);
+      setProvider(provider);
+    }
+  }, [account]);
+
+  useEffect(() => {
+    if (provider) {
       getStreamToContract();
       getItems();
     }
-  }, [account]);
+  }, [provider]);
 
   useEffect(() => {
     if (stream) {
@@ -290,313 +199,310 @@ export default function Home() {
 
   return (
     <div>
-      {account ? (
-        <>
-          <Button
-            icon={<WalletOutlined />}
-            type="default"
-            onClick={handleDisconnectWallet}
-          >
-            {account.slice(0, 8) + "..." + account.slice(-5)}
-          </Button>
-          <Tabs
-            type="line"
-            animated
-            style={{ marginBottom: 20 }}
-            defaultActiveKey="1"
-            items={[
-              {
-                key: "1",
-                label: "Account",
-                children: (
-                  <div className={styles.cardContainer}>
-                    <Card
-                      title="Your Stream to contract"
-                      bordered
-                      hoverable
-                      loading={dataLoading}
-                      extra={
-                        <Space>
-                          <Button
-                            title="Refresh"
-                            type="primary"
-                            shape="circle"
-                            icon={<SyncOutlined spin={dataLoading} />}
-                            onClick={getStreamToContract}
-                          />
-                          {stream ? (
-                            <>
-                              <Popconfirm
-                                title={
-                                  <>
-                                    <h3>Enter new flow rate</h3>
-                                    <Input
-                                      type="number"
-                                      placeholder="Flowrate in no. of tokens"
-                                      addonAfter="/month"
-                                      value={updatedFlowRateInput}
-                                      onChange={(e) =>
-                                        setUpdatedFlowRateInput(e.target.value)
-                                      }
-                                    />
-                                    <p>
-                                      *You are Streaming{" "}
-                                      <b>
-                                        {updatedFlowRateInput || 0} fDAIx/month
-                                      </b>{" "}
-                                      to contract
-                                    </p>
-                                  </>
-                                }
-                                onConfirm={() =>
-                                  handleUpdateStreamToContract(
-                                    updatedFlowRateInput
-                                  )
-                                }
-                              >
-                                <Button
-                                  title="Update"
-                                  icon={<EditOutlined />}
-                                  type="primary"
-                                  shape="circle"
-                                />
-                              </Popconfirm>
-                              <Popconfirm
-                                title="Are you sure to delete?"
-                                onConfirm={handleDeleteStream}
-                              >
-                                <Button
-                                  title="Delete"
-                                  icon={<DeleteOutlined />}
-                                  type="primary"
-                                  shape="circle"
-                                  danger
-                                />
-                              </Popconfirm>
-                            </>
-                          ) : (
+      <Button
+        type="primary"
+        onClick={handleWalletConnection}
+        icon={<WalletFilled />}
+        loading={loading?.connect}
+      >
+        {account
+          ? account.slice(0, 5) + "..." + account.slice(-5)
+          : "Connect Wallet"}
+      </Button>
+      {account && (
+        <Tabs
+          type="line"
+          animated
+          style={{ marginBottom: 20 }}
+          defaultActiveKey="1"
+          items={[
+            {
+              key: "1",
+              label: "Account",
+              children: (
+                <div className={styles.cardContainer}>
+                  <Card
+                    title="Your Stream to contract"
+                    bordered
+                    hoverable
+                    loading={dataLoading}
+                    extra={
+                      <Space>
+                        <Button
+                          title="Refresh"
+                          type="default"
+                          shape="circle"
+                          icon={<SyncOutlined spin={dataLoading} />}
+                          onClick={getStreamToContract}
+                        />
+                        {stream ? (
+                          <>
+                            <CheckoutWidget title={"Update"} icon={<EditOutlined />} />
                             <Popconfirm
-                              title={
-                                <>
-                                  <h3>Enter flow rate</h3>
-                                  <Input
-                                    type="number"
-                                    placeholder="Flowrate in no. of tokens"
-                                    addonAfter="/month"
-                                    value={flowRateInput}
-                                    onChange={(e) =>
-                                      setFlowRateInput(e.target.value)
-                                    }
-                                  />
-                                  <p>
-                                    *You are Streaming{" "}
-                                    <b>{flowRateInput || 0} fDAIx/month</b> to
-                                    contract
-                                  </p>
-                                </>
-                              }
-                              onConfirm={() =>
-                                handleCreateStreamToContract(flowRateInput)
-                              }
+                              title="Are you sure to delete this stream?"
+                              onConfirm={handleDeleteStream}
                             >
                               <Button
+                                title="Delete"
+                                icon={<DeleteOutlined />}
                                 type="primary"
                                 shape="circle"
-                                title="Create new stream"
-                                icon={<PlusCircleOutlined />}
+                                danger
                               />
                             </Popconfirm>
-                          )}
-                        </Space>
-                      }
-                    >
-                      {stream ? (
-                        <>
-                          <div style={{ textAlign: "center" }}>
+                          </>
+                        ) : (
+                          <CheckoutWidget title={"Open Stream"} icon={<PlusCircleOutlined />} />
+                        )}
+                      </Space>
+                    }
+                  >
+                    {stream ? (
+                      <>
+                        <div style={{ textAlign: "center" }}>
+                          <Statistic
+                            title="Total Amount Streamed (Since Updated)"
+                            valueStyle={{
+                              color: "#10bb35",
+                              fontSize: "1.5rem"
+                            }}
+                            value={`${amountStreamedSinceLastUpdate} ${supportedTokenSymbol}`}
+                            precision={9}
+                          />
+                        </div>
+                        <Space>
+                          <Card>
                             <Statistic
-                              title="Total Amount Streamed (Since Updated)"
-                              valueStyle={{
-                                color: "#10bb35",
-                                fontSize: "1.5rem"
-                              }}
-                              value={`${amountStreamedSinceLastUpdate} fDAIx`}
-                              precision={9}
+                              title={
+                                <Space>
+                                  Sender (You)
+                                  <a
+                                    href={`https://basescan.org/address/${stream?.sender}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    <ExportOutlined title="View on Basescan" />
+                                  </a>
+                                </Space>
+                              }
+                              value={
+                                stream?.sender?.slice(0, 5) +
+                                "..." +
+                                stream?.sender?.slice(-5)
+                              }
                             />
-                          </div>
-                          <Space>
-                            <Card>
-                              <Statistic
-                                title="Sender (You)"
-                                value={
-                                  stream?.sender?.slice(0, 5) +
-                                  "..." +
-                                  stream?.sender?.slice(-5)
-                                }
-                              />
-                            </Card>
-                            <Image
-                              src="/flow_animation.gif"
-                              alt="flow-animation"
-                              width={75}
-                              height={70}
+                          </Card>
+                          <Image
+                            src="/flow_animation.gif"
+                            alt="flow-animation"
+                            width={75}
+                            height={70}
+                          />
+                          <Card>
+                            <Statistic
+                              title={
+                                <Space>
+                                  Receiver (Contract)
+                                  <a
+                                    href={`https://basescan.org/address/${stream?.receiver}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
+                                    <ExportOutlined title="View on Basescan" />
+                                  </a>
+                                </Space>
+                              }
+                              value={
+                                stream?.receiver?.slice(0, 5) +
+                                "..." +
+                                stream?.receiver?.slice(-5)
+                              }
                             />
-                            <Card>
-                              <Statistic
-                                title="Receiver (Contract)"
-                                value={
-                                  stream?.receiver?.slice(0, 5) +
-                                  "..." +
-                                  stream?.receiver?.slice(-5)
-                                }
-                              />
-                            </Card>
-                          </Space>
-                          <h3 style={{ textAlign: "center" }}>
-                            {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
-                            fDAIx/month
-                          </h3>
-                          <Divider orientation="right" plain>
-                            Last Updated:{" "}
-                            {dayjs(stream?.lastUpdated * 1000).fromNow()}
-                          </Divider>
-                          <div style={{ textAlign: "center" }}>
-                            <h3>Mint an item</h3>
-                            <p>Mint a new item and unlock your super powers</p>
-                            <Space.Compact style={{ width: "90%" }}>
-                              <Input
-                                type="text"
-                                value={mintToAddress}
-                                placeholder="Address to mint to"
-                                onChange={(e) =>
-                                  setMintToAddress(e.target.value)
-                                }
-                              />
-                              <Button
-                                type="primary"
-                                title="Mint new item"
-                                loading={loading.mintItem}
-                                icon={<ArrowRightOutlined />}
-                                onClick={handleMintItem}
-                              />
-                            </Space.Compact>
-                          </div>
-                        </>
-                      ) : (
-                        <p>
-                          No stream found. Open a stream to contract and unlock
-                          your super powers
-                        </p>
-                      )}
-                    </Card>
-                  </div>
-                )
-              },
-              {
-                key: "2",
-                label: "Items",
-                children: (
-                  <div>
-                    <h1 style={{ textAlign: "center" }}>Items</h1>
-                    <Button
-                      type="primary"
-                      icon={<SyncOutlined spin={dataLoading} />}
-                      onClick={getItems}
-                    />
-                    <Row gutter={[16, 18]}>
-                      {items?.length > 0 ? (
-                        items.map((item) => {
-                          return (
-                            <Col key={item?.id} xs={20} sm={10} md={6} lg={4}>
+                          </Card>
+                        </Space>
+                        <h3 style={{ textAlign: "center" }}>
+                          {calculateFlowRateInTokenPerMonth(stream?.flowRate)}{" "}
+                          {supportedTokenSymbol}/month
+                        </h3>
+                        <Divider orientation="right" plain>
+                          Last Updated:{" "}
+                          {dayjs(stream?.lastUpdated * 1000).fromNow()}
+                        </Divider>
+                        <div style={{ textAlign: "center" }}>
+                          <h3>Mint an item</h3>
+                          <p>Mint a new item and unlock your super powers</p>
+                          <p>
+                            *You can mint an item if you have streamed atleast{" "}
+                            <b>
+                              0.01{" "}
                               <a
-                                href={`https://testnet.rarible.com/token/polygon/${contractAddress}:${item?.id}`}
+                                href={`https://basescan.org/token/${supportedTokenAddress}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                <Card
-                                  hoverable
-                                  bordered
-                                  loading={dataLoading}
-                                  style={{
-                                    cursor: "pointer",
-                                    width: "100%",
-                                    marginTop: 14,
-                                    borderRadius: 10,
-                                    border: "1px solid #d9d9d9"
-                                  }}
-                                  cover={
-                                    <img
-                                      alt="item"
-                                      src={item?.image}
-                                      style={{
-                                        marginTop: 10,
-                                        width: "100%",
-                                        maxHeight: "260px", // You can adjust this value
-                                        objectFit: "contain",
-                                        borderRadius: 10
-                                      }}
-                                    />
-                                  }
-                                >
-                                  <Card.Meta
-                                    title={item?.name}
-                                    description={"SuperUnlockable"}
-                                  />
-                                  <Divider />
-                                  <Statistic
-                                    title="Power"
-                                    value={item?.attributes[0]?.value}
-                                    suffix=" HP"
-                                    groupSeparator=""
-                                    valueStyle={{
-                                      color: "#10bb35",
-                                      fontSize: "1rem"
-                                    }}
-                                  />
-
-                                  <Statistic
-                                    title="Speed"
-                                    value={item?.attributes[1]?.value}
-                                    suffix=" Km/h"
-                                    groupSeparator=""
-                                    valueStyle={{
-                                      color: "#1677ff",
-                                      fontSize: "1rem"
-                                    }}
-                                  />
-                                  <Statistic
-                                    title="Age"
-                                    value={item?.attributes[2]?.value}
-                                    suffix=" Secs"
-                                    groupSeparator=""
-                                    valueStyle={{
-                                      color: "#ff4d4f",
-                                      fontSize: "1rem"
-                                    }}
-                                  />
-                                </Card>
+                                {supportedTokenSymbol}
                               </a>
-                            </Col>
-                          );
-                        })
-                      ) : (
-                        <Empty description="No items found" />
-                      )}
-                    </Row>
-                  </div>
-                )
-              }
-            ]}
-          />
-        </>
-      ) : (
-        <Button
-          type="primary"
-          icon={<WalletFilled />}
-          loading={loading.connect}
-          onClick={handleConnectWallet}
-        >
-          Connect Wallet
-        </Button>
+                            </b>{" "}
+                            to contract
+                          </p>
+                          <p>
+                            *Your Item's attributes will be dynamic based on
+                            your stream
+                          </p>
+                          <Space.Compact style={{ width: "90%" }}>
+                            <Input
+                              type="text"
+                              value={mintToAddress}
+                              placeholder="Address to mint to"
+                              onChange={(e) => setMintToAddress(e.target.value)}
+                            />
+                            <Button
+                              type="primary"
+                              title="Mint new item"
+                              loading={loading.mintItem}
+                              icon={<ArrowRightOutlined />}
+                              onClick={handleMintItem}
+                            />
+                          </Space.Compact>
+                        </div>
+                      </>
+                    ) : (
+                      <Empty
+                        description={
+                          <>
+                            <b>
+                              No stream found. Open a stream to contract and
+                              unlock your super powers{" "}
+                            </b>
+                            <p>
+                              *You can mint an item if you have streamed atleast{" "}
+                              <b>
+                                0.01{" "}
+                                <a
+                                  href={`https://basescan.org/token/${supportedTokenAddress}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {supportedTokenSymbol}
+                                </a>
+                              </b>{" "}
+                              to contract
+                            </p>
+                            <p>
+                              *Your Item's attributes will be dynamic based on
+                              your stream
+                            </p>
+                          </>
+                        }
+                      />
+                    )}
+                  </Card>
+                </div>
+              )
+            },
+            {
+              key: "2",
+              label: "Items",
+              children: (
+                <div>
+                  <h1 style={{ textAlign: "center" }}>Items</h1>
+                  <Button
+                    type="primary"
+                    shape="circle"
+                    icon={<SyncOutlined spin={dataLoading} />}
+                    onClick={getItems}
+                  />
+                  <Row gutter={[16, 18]}>
+                    {items?.length > 0 ? (
+                      items.map((item) => {
+                        return (
+                          <Col key={item?.id} xs={20} sm={10} md={6} lg={4}>
+                            <Card
+                              hoverable
+                              bordered
+                              loading={dataLoading}
+                              style={{
+                                // cursor: "pointer",
+                                width: "100%",
+                                marginTop: 14,
+                                borderRadius: 10,
+                                border: "1px solid #d9d9d9"
+                              }}
+                              cover={
+                                <img
+                                  alt="item"
+                                  src={item?.image}
+                                  style={{
+                                    marginTop: 10,
+                                    width: "100%",
+                                    maxHeight: "260px", // You can adjust this value
+                                    objectFit: "contain",
+                                    borderRadius: 10
+                                  }}
+                                />
+                              }
+                            >
+                              <Card.Meta
+                                title={
+                                  <Space>
+                                    {item?.name}
+                                    <a
+                                      href={`https://opensea.io/assets/base/${contractAddress}/${item?.id}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                    >
+                                      <ExportOutlined title="View on Opensea" />
+                                    </a>
+                                  </Space>
+                                }
+                                description={"SuperUnlockable"}
+                              />
+                              <Divider />
+                              <p>Attributes</p>
+                              <Statistic
+                                title="Power"
+                                value={item?.attributes[0]?.value}
+                                suffix=" Wei"
+                                groupSeparator=""
+                                valueStyle={{
+                                  color: "#10bb35",
+                                  fontSize: "1rem"
+                                }}
+                              />
+
+                              <Statistic
+                                title="Speed"
+                                value={item?.attributes[1]?.value}
+                                suffix=" Wei/Sec"
+                                groupSeparator=""
+                                valueStyle={{
+                                  color: "#1677ff",
+                                  fontSize: "1rem"
+                                }}
+                              />
+                              <Statistic
+                                title="Age"
+                                value={item?.attributes[2]?.value}
+                                suffix=" Secs"
+                                groupSeparator=""
+                                valueStyle={{
+                                  color: "#ff4d4f",
+                                  fontSize: "1rem"
+                                }}
+                              />
+                            </Card>
+                          </Col>
+                        );
+                      })
+                    ) : (
+                      <Empty description="No items found" />
+                    )}
+                  </Row>
+                </div>
+              )
+            }
+          ]}
+        />
       )}
     </div>
   );

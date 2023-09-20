@@ -29,10 +29,9 @@ export default function SiteLayout({ children }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          ©{new Date().getFullYear()} Salman Dabbakuti. Powered by
-          TheGraph & Ant Design
+          ©{new Date().getFullYear()} Salman Dabbakuti. Powered Superfluid & Base
         </a>
-        <p style={{ fontSize: "12px" }}>v0.27.0</p>
+        <p style={{ fontSize: "12px" }}>v0.28.2</p>
       </Footer>
     </Layout>
   );

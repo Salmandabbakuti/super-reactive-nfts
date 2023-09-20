@@ -1,36 +1,89 @@
-# hardhat-boilerplate
+# Super Unlockable NFTs
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts with balances.
+Unleash your money-streaming powers with SuperUnlockable collection. You can showcase your financial prowess and level up your character in the world of decentralized gaming. As you meet the required streaming thresholds, you'll gain access to mint these exceptional in-game items. The key? Your item's attributes dynamically respond to your streaming activity. The more you stream, the mightier your in-game item becomes. Wanna Try it out? [SuperUnlockable Dapp](https://superunlockable-develop.vercel.app/)
 
-> Recommended to use Node.js v14+ and npm v7+.
+> Note: To mint/unlock NFTs, you'll need to stream a minimum of 0.01 [`USDbCx`](https://basescan.org/token/0x4db26c973fae52f43bd96a8776c2bf1b0dc29556) to the [SuperUnlockable Contract](https://basescan.org/address/0xdaf74831881645fd64cab0673f4b8b79c36d232d) on [Base mainnet](https://base.org). You can get `USDbCx` by depositing `USDbC` into your account and then wrapping it to `USDbCx` on the [Superfluid App](https://app.superfluid.finance/wrap).
 
-Try running some of the following tasks:
+#### Minting Your Super Powers
 
-```shell
+Once you've successfully streamed the required amount of USDbCx and minted your SuperUnlockable item, you'll unlock unique in-game powers and abilities. The key? Your item's attributes dynamically respond to your streaming activity. The longer and more consistently you stream, the more powerful your in-game item becomes.
+
+#### Item Attributes
+
+Your SuperUnlockable item attributes are determined by your streaming data:
+
+**Power**: The amount of power you gain is based on the duration and consistency of your streaming activity. The longer and more the flowrate, the more powerful your in-game item becomes.
+
+**Speed**: Your in-game item's speed in the game world is directly proportional to the amount of `USDbCx/second` you're streaming to the contract.
+
+**Age**: The age of your in-game character reflects how long you've been actively streaming to the contract.
+
+### Screenshots
+
+#### Stream Widget
+
+![Stream To Contract Widget](https://github.com/Salmandabbakuti/super-unlockable-nfts/assets/29351207/32060284-d5a0-4d61-b58e-64019397b4b5)
+
+#### Items
+
+![Items](https://github.com/Salmandabbakuti/super-unlockable-nfts/assets/29351207/7d6c464a-f8f6-491a-ad5d-59fb37e1f8f4)
+
+## Getting Started
+
+You can try out the demo [here](https://superunlockable-develop.vercel.app/).
+
+> Copy the `.env.example` file to `.env` and fill in the required environment variables.
+
+1. Install required dependencies:
+
+```bash
+npm install
+```
+
+2. Compile Contracts:
+
+```bash
+npx hardhat compile
+```
+
+3. Deploy Contract:
+
+```bash
+npx hardhat deploy --network base
+```
+
+4. Start the client application:
+
+> Copy the `.env.example` file to `.env` and fill in the required environment variables.
+
+```bash
+cd client
+
 npm install
 
-# starts local node
-npx hardhat node
-
-# compile contracts
-npx hardhat compile
-
-# deploy contract defined in tasks on specified network
-npx hardhat deploy --network local
-
-# deploy contract in scripts/deploy.js on specified network
-npx hardhat run scripts/deploy.js --network local
-
-# verify contract on etherscan
-npx hardhat verify --network <DEPLOYED_NETWORK> <DEPLOYED_CONTRACT_ADDRESS> "Constructor arg1" "Constructor arg2"
-# npx hardhat verify --network mumbai 0x18Ce4A4D16f1DDFe9dbcf900c49e0316DC47B115 "0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f" "10000000000000000"
-
-# unit tests
-npx hardhat test
-
-# remove all compiled and deployed artifacts
-npx hardhat clean
-
-# show help
-npx hardhat help
+npm run dev
 ```
+
+4. Navigate to http://localhost:3000/ in your browser to view the application. Start streaming to the contract to unlock the NFTs.
+
+### Demo
+
+## Credits & Resources:
+
+- [Superfluid Wavepool ideas](https://superfluidhq.notion.site/Superfluid-Wave-Project-Ideas-7e8c792758004bd2ae452d1f9810cc58)
+- [Superfluid Guides](https://docs.superfluid.finance/superfluid/resources/integration-guides)
+- [Base Docs](https://docs.base.org/)
+- [Hardhat](https://hardhat.org/getting-started/)
+- [Ethers.js](https://docs.ethers.io/v5/)
+- [Next.js](https://nextjs.org/docs/getting-started)
+
+## Safety
+
+This is experimental software and subject to change over time.
+
+This is a proof of concept and is not ready for production use. It is not audited and has not been tested for security. Use at your own risk.
+I do not give any warranties and will not be liable for any loss incurred through any use of this codebase.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
