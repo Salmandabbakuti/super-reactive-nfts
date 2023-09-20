@@ -38,7 +38,6 @@ import {
   supportedTokenSymbol,
   calculateFlowRateInTokenPerMonth,
   calculateTotalStreamedSinceLastUpdate,
-  cfav1ForwarderContract,
   contract
 } from "./utils";
 import styles from "./page.module.css";
@@ -83,14 +82,14 @@ export default function Home() {
   };
 
   const handleDeleteStream = async () => {
-    if (!account || !cfav1ForwarderContract)
+    if (!account || !provider)
       return message.error("Please connect wallet first");
     if (!stream) return message.error("No stream found open to contract");
     try {
       const signer = provider.getSigner();
-      const tx = await cfav1ForwarderContract
+      const tx = await contract
         .connect(signer)
-        .deleteFlow(supportedTokenAddress, account, contractAddress, "0x");
+        .deleteFlowToContract();
       await tx.wait();
       message.success("Stream deleted successfully");
     } catch (err) {
@@ -122,7 +121,7 @@ export default function Home() {
   const getStreamToContract = async () => {
     setDataLoading(true);
     try {
-      const { lastUpdated, flowRate } = await cfav1ForwarderContract
+      const { lastUpdated, flowRate } = await contract
         .connect(provider)
         .getFlowInfo(supportedTokenAddress, account, contractAddress);
       const stream =
