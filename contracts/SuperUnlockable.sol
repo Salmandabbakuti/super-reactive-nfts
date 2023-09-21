@@ -51,6 +51,11 @@ contract SuperUnlockable is ERC721 {
         );
     }
 
+    /// @notice deletes supportedToken flow from caller to contract
+    function deleteFlowToContract() public returns (bool) {
+        return supportedToken.deleteFlow(msg.sender, address(this));
+    }
+
     /// @notice Mints a new SuperUnlockable item
     /// @param _to The address of the user who will receive the new SuperUnlockable item
     /// @dev This function will mint a new SuperUnlockable item if the user has deposited enough SuperTokens through a stream into the contract
