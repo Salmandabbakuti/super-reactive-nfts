@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Web3Provider } from "@ethersproject/providers";
+import { isAddress } from "@ethersproject/address";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useWeb3Modal } from "@web3modal/react";
@@ -102,6 +103,8 @@ export default function Home() {
     if (!account || !provider)
       return message.error("Please connect wallet first");
     if (!mintToAddress) return message.error("Please enter address to mint to");
+    if (!isAddress(mintToAddress))
+      return message.error("Please enter valid address to mint to");
     try {
       setLoading({ mintItem: true });
       const signer = provider.getSigner();
@@ -111,10 +114,10 @@ export default function Home() {
       setLoading({ mintItem: false });
     } catch (err) {
       setLoading({ mintItem: false });
+      console.error("failed to mint item: ", err);
       message.error(
         "Failed to mint item. Make sure your stream deposit raised enough to mint item"
       );
-      console.error("failed to mint item: ", err);
     }
   };
 
