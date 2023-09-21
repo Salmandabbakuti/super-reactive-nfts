@@ -102,7 +102,6 @@ export default function Home() {
   const handleMintItem = async () => {
     if (!account || !provider)
       return message.error("Please connect wallet first");
-    if (!mintToAddress) return message.error("Please enter address to mint to");
     if (!isAddress(mintToAddress))
       return message.error("Please enter valid address to mint to");
     try {
@@ -206,6 +205,7 @@ export default function Home() {
         onClick={handleWalletConnection}
         icon={<WalletFilled />}
         loading={loading?.connect}
+        style={{ borderRadius: 25 }}
       >
         {account
           ? account.slice(0, 5) + "..." + account.slice(-5)
@@ -215,16 +215,15 @@ export default function Home() {
         <Tabs
           type="line"
           animated
-          style={{ marginBottom: 20 }}
-          defaultActiveKey="1"
+          defaultActiveKey="account"
           items={[
             {
-              key: "1",
+              key: "account",
               label: "Account",
               children: (
                 <div className={styles.cardContainer}>
                   <Card
-                    title="Your Stream to contract"
+                    title="Your Stream to SuperUnlockable"
                     bordered
                     hoverable
                     loading={dataLoading}
@@ -403,12 +402,12 @@ export default function Home() {
               )
             },
             {
-              key: "2",
+              key: "items",
               label: "Items",
               children: (
                 <div>
-                  <h1 style={{ textAlign: "center" }}>Items</h1>
                   <Button
+                    title="Refresh"
                     type="primary"
                     shape="circle"
                     icon={<SyncOutlined spin={dataLoading} />}

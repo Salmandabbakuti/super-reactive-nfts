@@ -22,7 +22,7 @@ Your SuperUnlockable item attributes are determined by your streaming data:
 
 #### Stream Widget
 
-![Stream To Contract Widget](https://github.com/Salmandabbakuti/super-unlockable-nfts/assets/29351207/32060284-d5a0-4d61-b58e-64019397b4b5)
+![Stream To Contract Widget](https://github.com/Salmandabbakuti/super-unlockable-nfts/assets/29351207/ec68e8e0-081c-4cba-8a0b-15ae62d74206)
 
 #### Items
 
