@@ -29,6 +29,7 @@ import {
   PlusCircleOutlined
 } from "@ant-design/icons";
 import CheckoutWidget from "./components/CheckoutWidget";
+import LandingPage from "./components/LandingPage";
 
 import {
   contractAddress,
@@ -49,10 +50,8 @@ export default function Home() {
   const [loading, setLoading] = useState({ connect: false });
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
-  const [
-    amountStreamedSinceLastUpdate,
-    setAmountStreamedSinceLastUpdate
-  ] = useState(0);
+  const [amountStreamedSinceLastUpdate, setAmountStreamedSinceLastUpdate] =
+    useState(0);
 
   const { address: account } = useAccount();
 
@@ -62,9 +61,7 @@ export default function Home() {
     if (!stream) return message.error("No stream found open to contract");
     try {
       const signer = provider.getSigner();
-      const tx = await contract
-        .connect(signer)
-        .deleteFlowToContract();
+      const tx = await contract.connect(signer).deleteFlowToContract();
       await tx.wait();
       message.success("Stream deleted successfully");
     } catch (err) {
@@ -161,10 +158,11 @@ export default function Home() {
   useEffect(() => {
     if (stream) {
       const intervalId = setInterval(() => {
-        const amountStreamedSinceLastUpdate = calculateTotalStreamedSinceLastUpdate(
-          stream?.flowRate,
-          stream?.lastUpdated
-        );
+        const amountStreamedSinceLastUpdate =
+          calculateTotalStreamedSinceLastUpdate(
+            stream?.flowRate,
+            stream?.lastUpdated
+          );
         setAmountStreamedSinceLastUpdate(amountStreamedSinceLastUpdate);
       }, 100);
 
@@ -174,7 +172,7 @@ export default function Home() {
 
   return (
     <div>
-      {account && (
+      {account ? (
         <Tabs
           type="line"
           animated
@@ -201,7 +199,10 @@ export default function Home() {
                         />
                         {stream ? (
                           <>
-                            <CheckoutWidget title={"Update"} icon={<EditOutlined />} />
+                            <CheckoutWidget
+                              title={"Update"}
+                              icon={<EditOutlined />}
+                            />
                             <Popconfirm
                               title="Are you sure to delete this stream?"
                               onConfirm={handleDeleteStream}
@@ -216,7 +217,10 @@ export default function Home() {
                             </Popconfirm>
                           </>
                         ) : (
-                          <CheckoutWidget title={"Open Stream"} icon={<PlusCircleOutlined />} />
+                          <CheckoutWidget
+                            title={"Open Stream"}
+                            icon={<PlusCircleOutlined />}
+                          />
                         )}
                       </Space>
                     }
@@ -467,6 +471,8 @@ export default function Home() {
             }
           ]}
         />
+      ) : (
+        <LandingPage />
       )}
     </div>
   );
