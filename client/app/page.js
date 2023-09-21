@@ -5,9 +5,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useWeb3Modal } from "@web3modal/react";
-import { useAccount, useDisconnect } from "wagmi";
-import { base } from "wagmi/chains";
+import { useAccount } from "wagmi";
 import {
   Button,
   Input,
@@ -26,7 +24,6 @@ import {
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  WalletFilled,
   ArrowRightOutlined,
   ExportOutlined,
   PlusCircleOutlined
@@ -57,30 +54,7 @@ export default function Home() {
     setAmountStreamedSinceLastUpdate
   ] = useState(0);
 
-  const { address: account, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
-  const { open, setDefaultChain } = useWeb3Modal();
-
-  const handleWalletConnection = async () => {
-    setLoading({ connect: true });
-    try {
-      if (isConnected) return disconnectWallet();
-      await open();
-      setDefaultChain(base);
-    } catch (err) {
-      console.error("failed to connect wallet: ", err);
-      message.error("Failed to connect wallet");
-    } finally {
-      setLoading({ connect: false });
-    }
-  };
-
-  const disconnectWallet = () => {
-    disconnect();
-    setStream(null);
-    setProvider(null);
-    message.success("Wallet disconnected");
-  };
+  const { address: account } = useAccount();
 
   const handleDeleteStream = async () => {
     if (!account || !provider)
@@ -192,7 +166,7 @@ export default function Home() {
           stream?.lastUpdated
         );
         setAmountStreamedSinceLastUpdate(amountStreamedSinceLastUpdate);
-      }, 1000);
+      }, 100);
 
       return () => clearInterval(intervalId);
     }
@@ -200,17 +174,6 @@ export default function Home() {
 
   return (
     <div>
-      <Button
-        type="primary"
-        onClick={handleWalletConnection}
-        icon={<WalletFilled />}
-        loading={loading?.connect}
-        style={{ borderRadius: 25 }}
-      >
-        {account
-          ? account.slice(0, 5) + "..." + account.slice(-5)
-          : "Connect Wallet"}
-      </Button>
       {account && (
         <Tabs
           type="line"
