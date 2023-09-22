@@ -5,9 +5,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useWeb3Modal } from "@web3modal/react";
-import { useAccount, useDisconnect } from "wagmi";
-import { base } from "wagmi/chains";
+import { useAccount } from "wagmi";
 import {
   Button,
   Input,
@@ -26,12 +24,12 @@ import {
   SyncOutlined,
   EditOutlined,
   DeleteOutlined,
-  WalletFilled,
   ArrowRightOutlined,
   ExportOutlined,
   PlusCircleOutlined
 } from "@ant-design/icons";
 import CheckoutWidget from "./components/CheckoutWidget";
+import LandingPage from "./components/LandingPage";
 
 import {
   contractAddress,
@@ -52,35 +50,10 @@ export default function Home() {
   const [loading, setLoading] = useState({ connect: false });
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
-  const [
-    amountStreamedSinceLastUpdate,
-    setAmountStreamedSinceLastUpdate
-  ] = useState(0);
+  const [amountStreamedSinceLastUpdate, setAmountStreamedSinceLastUpdate] =
+    useState(0);
 
-  const { address: account, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
-  const { open, setDefaultChain } = useWeb3Modal();
-
-  const handleWalletConnection = async () => {
-    setLoading({ connect: true });
-    try {
-      if (isConnected) return disconnectWallet();
-      await open();
-      setDefaultChain(base);
-    } catch (err) {
-      console.error("failed to connect wallet: ", err);
-      message.error("Failed to connect wallet");
-    } finally {
-      setLoading({ connect: false });
-    }
-  };
-
-  const disconnectWallet = () => {
-    disconnect();
-    setStream(null);
-    setProvider(null);
-    message.success("Wallet disconnected");
-  };
+  const { address: account } = useAccount();
 
   const handleDeleteStream = async () => {
     if (!account || !provider)
@@ -88,9 +61,7 @@ export default function Home() {
     if (!stream) return message.error("No stream found open to contract");
     try {
       const signer = provider.getSigner();
-      const tx = await contract
-        .connect(signer)
-        .deleteFlowToContract();
+      const tx = await contract.connect(signer).deleteFlowToContract();
       await tx.wait();
       message.success("Stream deleted successfully");
     } catch (err) {
@@ -187,12 +158,13 @@ export default function Home() {
   useEffect(() => {
     if (stream) {
       const intervalId = setInterval(() => {
-        const amountStreamedSinceLastUpdate = calculateTotalStreamedSinceLastUpdate(
-          stream?.flowRate,
-          stream?.lastUpdated
-        );
+        const amountStreamedSinceLastUpdate =
+          calculateTotalStreamedSinceLastUpdate(
+            stream?.flowRate,
+            stream?.lastUpdated
+          );
         setAmountStreamedSinceLastUpdate(amountStreamedSinceLastUpdate);
-      }, 1000);
+      }, 150);
 
       return () => clearInterval(intervalId);
     }
@@ -200,18 +172,7 @@ export default function Home() {
 
   return (
     <div>
-      <Button
-        type="primary"
-        onClick={handleWalletConnection}
-        icon={<WalletFilled />}
-        loading={loading?.connect}
-        style={{ borderRadius: 25 }}
-      >
-        {account
-          ? account.slice(0, 5) + "..." + account.slice(-5)
-          : "Connect Wallet"}
-      </Button>
-      {account && (
+      {account ? (
         <Tabs
           type="line"
           animated
@@ -238,7 +199,10 @@ export default function Home() {
                         />
                         {stream ? (
                           <>
-                            <CheckoutWidget title={"Update"} icon={<EditOutlined />} />
+                            <CheckoutWidget
+                              title={"Update"}
+                              icon={<EditOutlined />}
+                            />
                             <Popconfirm
                               title="Are you sure to delete this stream?"
                               onConfirm={handleDeleteStream}
@@ -253,7 +217,10 @@ export default function Home() {
                             </Popconfirm>
                           </>
                         ) : (
-                          <CheckoutWidget title={"Open Stream"} icon={<PlusCircleOutlined />} />
+                          <CheckoutWidget
+                            title={"Open Stream"}
+                            icon={<PlusCircleOutlined />}
+                          />
                         )}
                       </Space>
                     }
@@ -504,6 +471,8 @@ export default function Home() {
             }
           ]}
         />
+      ) : (
+        <LandingPage />
       )}
     </div>
   );
