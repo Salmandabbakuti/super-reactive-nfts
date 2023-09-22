@@ -164,7 +164,7 @@ export default function Home() {
             stream?.lastUpdated
           );
         setAmountStreamedSinceLastUpdate(amountStreamedSinceLastUpdate);
-      }, 100);
+      }, 150);
 
       return () => clearInterval(intervalId);
     }

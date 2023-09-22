@@ -8,7 +8,7 @@ import {
   w3mProvider
 } from "@web3modal/ethereum";
 
-const projectId = "952483bf7a0f5ace4c40eb53967f1368";
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "952483bf7a0f5ace4c40eb53967f1368";
 const supportedNetworks = [base, baseGoerli];
 
 const { publicClient } = configureChains(supportedNetworks, [
