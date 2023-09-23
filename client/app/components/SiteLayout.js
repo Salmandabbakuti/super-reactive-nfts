@@ -1,41 +1,18 @@
 "use client";
-import { useState } from "react";
-import { Layout } from "antd";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useAccount, useDisconnect } from "wagmi";
-import { Button, message } from "antd";
-import { WalletFilled } from "@ant-design/icons";
+import { Divider, Layout } from "antd";
 import "antd/dist/reset.css";
 
 const { Header, Footer, Content } = Layout;
 
 export default function SiteLayout({ children }) {
-  const [loading, setLoading] = useState({ connect: false });
-  const { address: account, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
-  const { open } = useWeb3Modal();
-
-  const handleWalletConnection = async () => {
-    setLoading({ connect: true });
-    try {
-      if (isConnected) return disconnectWallet();
-      await open({ view: "Connect" });
-    } catch (err) {
-      console.error("failed to connect wallet: ", err);
-      message.error("Failed to connect wallet");
-    } finally {
-      setLoading({ connect: false });
-    }
-  };
-
-  const disconnectWallet = () => {
-    disconnect();
-    message.success("Wallet disconnected");
-  };
-
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Header style={{ padding: 0 }}>
+      <Header
+        style={{
+          padding: 0,
+          color: "#fff"
+        }}
+      >
         <div
           style={{
             display: "flex",
@@ -44,18 +21,17 @@ export default function SiteLayout({ children }) {
             padding: "0 20px"
           }}
         >
-          <h3 style={{ color: "white" }}>Super Unlockable</h3>
-          <Button
-            type="primary"
-            onClick={handleWalletConnection}
-            icon={<WalletFilled />}
-            loading={loading?.connect}
-            style={{ borderRadius: 25 }}
-          >
-            {account
-              ? account.slice(0, 8) + "..." + account.slice(-5)
-              : "Connect Wallet"}
-          </Button>
+          <h3>Super Unlockable</h3>
+          <w3m-button
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "25px"
+            }}
+            size="sm"
+            loadingLabel="Connecting..."
+            label="Connect Wallet"
+            balance="show"
+          />
         </div>
       </Header>
       <Content
@@ -69,6 +45,7 @@ export default function SiteLayout({ children }) {
       >
         {children}
       </Content>
+      <Divider plain />
       <Footer style={{ textAlign: "center" }}>
         <a
           href="https://github.com/Salmandabbakuti"

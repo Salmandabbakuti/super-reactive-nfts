@@ -1,12 +1,12 @@
 "use client";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 import { WagmiConfig } from "wagmi";
-import { base, baseGoerli } from "wagmi/chains";
+import { base } from "wagmi/chains";
 
 const projectId =
   process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ||
   "952483bf7a0f5ace4c40eb53967f1368";
-const supportedChains = [base, baseGoerli];
+const supportedChains = [base];
 
 const wagmiConfig = defaultWagmiConfig({
   chains: supportedChains,
