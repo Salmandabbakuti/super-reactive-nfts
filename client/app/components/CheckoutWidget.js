@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useWeb3Modal } from "@web3modal/react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { Button, Badge } from "antd";
 import SuperfluidWidget from "@superfluid-finance/widget";
 import { supportedTokenAddress, contractAddress } from "@/app/utils";
