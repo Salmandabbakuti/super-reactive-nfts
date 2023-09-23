@@ -1,11 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Layout } from "antd";
-import { useWeb3Modal } from "@web3modal/react";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useAccount, useDisconnect } from "wagmi";
 import { Button, message } from "antd";
 import { WalletFilled } from "@ant-design/icons";
-import { base } from "wagmi/chains";
 import "antd/dist/reset.css";
 
 const { Header, Footer, Content } = Layout;
@@ -14,14 +13,13 @@ export default function SiteLayout({ children }) {
   const [loading, setLoading] = useState({ connect: false });
   const { address: account, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
-  const { open, setDefaultChain } = useWeb3Modal();
+  const { open } = useWeb3Modal();
 
   const handleWalletConnection = async () => {
     setLoading({ connect: true });
     try {
       if (isConnected) return disconnectWallet();
-      await open();
-      setDefaultChain(base);
+      await open({ view: "Connect" });
     } catch (err) {
       console.error("failed to connect wallet: ", err);
       message.error("Failed to connect wallet");

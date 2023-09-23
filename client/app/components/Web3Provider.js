@@ -1,38 +1,27 @@
 "use client";
-import { Web3Modal } from "@web3modal/react";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
+import { WagmiConfig } from "wagmi";
 import { base, baseGoerli } from "wagmi/chains";
-import {
-  EthereumClient,
-  w3mConnectors,
-  w3mProvider
-} from "@web3modal/ethereum";
 
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "952483bf7a0f5ace4c40eb53967f1368";
-const supportedNetworks = [base, baseGoerli];
+const projectId =
+  process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ||
+  "952483bf7a0f5ace4c40eb53967f1368";
+const supportedChains = [base, baseGoerli];
 
-const { publicClient } = configureChains(supportedNetworks, [
-  w3mProvider({ projectId })
-]);
-
-const wagmiConfig = createConfig({
-  autoConnect: false,
-  connectors: w3mConnectors({
-    projectId,
-    chains: supportedNetworks
-  }),
-  publicClient
+const wagmiConfig = defaultWagmiConfig({
+  chains: supportedChains,
+  projectId,
+  appName: "SuperUnlockable"
 });
-const ethereumClient = new EthereumClient(wagmiConfig, supportedNetworks);
 
+createWeb3Modal({
+  wagmiConfig,
+  projectId,
+  chains: supportedChains,
+  themeMode: "light",
+  defaultChain: base
+});
 
 export default function Web3Provider({ children }) {
-  return (
-    <>
-      <WagmiConfig config={wagmiConfig}>
-        {children}
-      </WagmiConfig>
-      <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
-    </>
-  );
+  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
 }
