@@ -1,6 +1,12 @@
 "use client";
-import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
-import { WagmiConfig } from "wagmi";
+import { useState, useEffect } from "react";
+import {
+  RainbowKitProvider,
+  lightTheme,
+  getDefaultWallets,
+  connectorsForWallets
+} from "@rainbow-me/rainbowkit";
+import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { base } from "wagmi/chains";
 
 const projectId =
@@ -8,20 +14,55 @@ const projectId =
   "952483bf7a0f5ace4c40eb53967f1368";
 const supportedChains = [base];
 
-const wagmiConfig = defaultWagmiConfig({
-  chains: supportedChains,
+import { publicProvider } from "wagmi/providers/public";
+
+const { chains, publicClient, webSocketPublicClient } = configureChains(
+  supportedChains,
+  [publicProvider()]
+);
+
+const { wallets } = getDefaultWallets({
+  appName: "Super Unlockable",
   projectId,
-  appName: "SuperUnlockable"
+  chains
 });
 
-createWeb3Modal({
-  wagmiConfig,
-  projectId,
-  chains: supportedChains,
-  themeMode: "light",
-  defaultChain: base
+const connectors = connectorsForWallets(wallets);
+
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors,
+  publicClient,
+  webSocketPublicClient
 });
 
 export default function Web3Provider({ children }) {
-  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  return (
+    <WagmiConfig config={wagmiConfig}>
+      <RainbowKitProvider
+        chains={supportedChains}
+        initialChain={base}
+        showRecentTransactions={true}
+        modalSize="compact"
+        // avatar={() => <img src="/favicon.ico" width={50} height={50} />}
+        theme={lightTheme()}
+        appInfo={{
+          appName: "Super Unlockable",
+          learnMoreUrl: "https://www.rainbowkit.com/",
+          disclaimer: () => (
+            <p>
+              Super Unlockable - Unleash the power of NFTs with Super Unlockable
+            </p>
+          )
+        }}
+      >
+        {mounted && children}
+      </RainbowKitProvider>
+    </WagmiConfig>
+  );
 }

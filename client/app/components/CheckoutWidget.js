@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Button, Badge } from "antd";
 import SuperfluidWidget from "@superfluid-finance/widget";
 import { supportedTokenAddress, contractAddress } from "@/app/utils";
@@ -67,20 +67,6 @@ const themeOptions = {
 };
 
 export default function CheckoutWidget({ title, icon }) {
-  const { open, isOpen, setDefaultChain } = useWeb3Modal();
-
-  const walletManager = useMemo(
-    () => ({
-      open: ({ chain }) => {
-        if (chain) {
-          setDefaultChain(chain);
-        }
-        open();
-      },
-      isOpen
-    }),
-    [open, isOpen, setDefaultChain]
-  );
 
   const eventListeners = useMemo(
     () => ({
@@ -91,25 +77,35 @@ export default function CheckoutWidget({ title, icon }) {
   );
 
   return (
-    <SuperfluidWidget
-      productDetails={productDetails}
-      paymentDetails={paymentDetails}
-      type="drawer"
-      walletManager={walletManager}
-      eventListeners={eventListeners}
-      theme={themeOptions}
-    >
-      {({ openModal }) => (
-        <Badge dot status="processing">
-          <Button
-            type="primary"
-            shape="circle"
-            title={title}
-            icon={icon}
-            onClick={() => openModal()}
-          />
-        </Badge>
-      )}
-    </SuperfluidWidget>
+    <ConnectButton.Custom>
+      {({ openConnectModal, connectModalOpen }) => {
+        const walletManager = {
+          open: async () => openConnectModal(),
+          isOpen: connectModalOpen,
+        };
+        return (
+          <SuperfluidWidget
+            productDetails={productDetails}
+            paymentDetails={paymentDetails}
+            type="drawer"
+            walletManager={walletManager}
+            eventListeners={eventListeners}
+            theme={themeOptions}
+          >
+            {({ openModal }) => (
+              <Badge dot status="processing">
+                <Button
+                  type="primary"
+                  shape="circle"
+                  title={title}
+                  icon={icon}
+                  onClick={() => openModal()}
+                />
+              </Badge>
+            )}
+          </SuperfluidWidget>
+        );
+      }}
+    </ConnectButton.Custom>
   );
 }

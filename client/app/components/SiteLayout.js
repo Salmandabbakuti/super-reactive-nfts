@@ -1,5 +1,7 @@
 "use client";
 import { Divider, Layout } from "antd";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import "@rainbow-me/rainbowkit/styles.css";
 import "antd/dist/reset.css";
 
 const { Header, Footer, Content } = Layout;
@@ -22,15 +24,20 @@ export default function SiteLayout({ children }) {
           }}
         >
           <h3>Super Unlockable</h3>
-          <w3m-button
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: "25px"
-            }}
-            size="sm"
-            loadingLabel="Connecting..."
-            label="Connect Wallet"
-            balance="show"
+          <ConnectButton
+            label="Connect Wallet" // button label
+            accountStatus={{
+              smallScreen: "avatar",
+              largeScreen: "full"
+            }} // or avatar, address, none
+            chainStatus={{
+              smallScreen: "icon",
+              largeScreen: "full"
+            }} //or icon, name, none
+            showBalance={{
+              smallScreen: false,
+              largeScreen: true
+            }} // or false
           />
         </div>
       </Header>
