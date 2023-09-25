@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { Web3Modal } from "@web3modal/react";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { base } from "wagmi/chains";
@@ -18,7 +19,7 @@ const { publicClient } = configureChains(supportedChains, [
 ]);
 
 const wagmiConfig = createConfig({
-  autoConnect: false,
+  autoConnect: true,
   connectors: w3mConnectors({
     projectId,
     chains: supportedChains
@@ -28,16 +29,19 @@ const wagmiConfig = createConfig({
 const ethereumClient = new EthereumClient(wagmiConfig, supportedChains);
 
 export default function Web3Provider({ children }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   return (
     <>
-      <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>
+      <WagmiConfig config={wagmiConfig}>{mounted && children}</WagmiConfig>
       <Web3Modal
         projectId={projectId}
         ethereumClient={ethereumClient}
         defaultChain={base}
         themeMode="light"
         themeVariables={{
-          '--w3m-button-border-radius': '25px'
+          "--w3m-button-border-radius": "25px"
         }}
       />
     </>
