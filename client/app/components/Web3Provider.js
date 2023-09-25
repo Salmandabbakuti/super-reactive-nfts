@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 import { WagmiConfig } from "wagmi";
 import { base } from "wagmi/chains";
@@ -23,5 +24,9 @@ createWeb3Modal({
 });
 
 export default function Web3Provider({ children }) {
-  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  return <WagmiConfig config={wagmiConfig}>{mounted && children}</WagmiConfig>;
 }
