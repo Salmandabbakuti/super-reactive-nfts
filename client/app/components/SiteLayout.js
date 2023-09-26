@@ -18,7 +18,7 @@ export default function SiteLayout({ children }) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "0 20px"
+            padding: "0 5px"
           }}
         >
           <h3>Super Unlockable</h3>
@@ -27,7 +27,7 @@ export default function SiteLayout({ children }) {
               backgroundColor: "#fff",
               borderRadius: "25px"
             }}
-            size="sm"
+            size="md"
             loadingLabel="Connecting..."
             label="Connect Wallet"
             balance="show"
@@ -55,7 +55,7 @@ export default function SiteLayout({ children }) {
           ©{new Date().getFullYear()} Salman Dabbakuti. Powered Superfluid &
           Base
         </a>
-        <p style={{ fontSize: "12px" }}>v0.30.2</p>
+        <p style={{ fontSize: "12px" }}>v0.30.3</p>
       </Footer>
     </Layout>
   );

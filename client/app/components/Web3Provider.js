@@ -30,7 +30,6 @@ createWeb3Modal({
 
 export default function Web3Provider({ children }) {
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => setMounted(true), []);
 
   return <WagmiConfig config={wagmiConfig}>{mounted && children}</WagmiConfig>;
