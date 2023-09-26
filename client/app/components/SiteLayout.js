@@ -36,8 +36,8 @@ export default function SiteLayout({ children }) {
       </Header>
       <Content
         style={{
-          margin: "24px 16px",
-          padding: 24,
+          margin: "12px 8px",
+          padding: 12,
           minHeight: "100%",
           color: "black",
           maxHeight: "100%"
@@ -55,7 +55,7 @@ export default function SiteLayout({ children }) {
           ©{new Date().getFullYear()} Salman Dabbakuti. Powered Superfluid &
           Base
         </a>
-        <p style={{ fontSize: "12px" }}>v0.30.1</p>
+        <p style={{ fontSize: "12px" }}>v0.30.2</p>
       </Footer>
     </Layout>
   );
