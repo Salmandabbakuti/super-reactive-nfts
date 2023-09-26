@@ -12,7 +12,12 @@ const supportedChains = [base];
 const wagmiConfig = defaultWagmiConfig({
   chains: supportedChains,
   projectId,
-  appName: "SuperUnlockable"
+  metadata: {
+    name: "SuperUnlockable",
+    description: "SuperUnlockable NFTS that adapt to your streaming activity!",
+    url: "https://superunlockable.vercel.app/",
+    icons: ["https://avatars.githubusercontent.com/u/37784886"]
+  }
 });
 
 createWeb3Modal({
