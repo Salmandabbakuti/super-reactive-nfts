@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { useWeb3Modal } from "@web3modal/react";
 import { Button, Badge } from "antd";
 import SuperfluidWidget from "@superfluid-finance/widget";
 import { supportedTokenAddress, contractAddress } from "@/app/utils";
@@ -67,20 +66,6 @@ const themeOptions = {
 };
 
 export default function CheckoutWidget({ title, icon }) {
-  const { open, isOpen, setDefaultChain } = useWeb3Modal();
-
-  const walletManager = useMemo(
-    () => ({
-      open: ({ chain }) => {
-        if (chain) {
-          setDefaultChain(chain);
-        }
-        open();
-      },
-      isOpen
-    }),
-    [open, isOpen, setDefaultChain]
-  );
 
   const eventListeners = useMemo(
     () => ({
@@ -95,7 +80,6 @@ export default function CheckoutWidget({ title, icon }) {
       productDetails={productDetails}
       paymentDetails={paymentDetails}
       type="drawer"
-      walletManager={walletManager}
       eventListeners={eventListeners}
       theme={themeOptions}
     >
