@@ -47,7 +47,7 @@ export default function SiteLayout({ children }) {
           ©{new Date().getFullYear()} Salman Dabbakuti. Powered Superfluid &
           Base
         </a>
-        <p style={{ fontSize: "12px" }}>v0.30.1</p>
+        <p style={{ fontSize: "12px" }}>v0.30.2</p>
       </Footer>
     </Layout>
   );
