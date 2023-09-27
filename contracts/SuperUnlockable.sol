@@ -201,7 +201,9 @@ contract SuperUnlockable is ERC721 {
             "</mask>",
             "</defs>",
             "</svg>",
-            '<animateTransform attributeName="transform" attributeType="XML" dur="5s" keyTimes="0;1" repeatCount="indefinite" type="rotate" values="0;360" calcMode="linear"/>',
+            _speed > 0
+                ? '<animateTransform attributeName="transform" attributeType="XML" dur="5s" keyTimes="0;1" repeatCount="indefinite" type="rotate" values="0;360" calcMode="linear"/>'
+                : "",
             "</g>",
             '<rect x="25%" y="25%" width="50%" height="50%" fill="#161B1D"/>',
             '<text x="50%" y="50%" text-anchor="middle" alignment-baseline="middle" font-size="48" fill="#fff">&#9889;</text>',

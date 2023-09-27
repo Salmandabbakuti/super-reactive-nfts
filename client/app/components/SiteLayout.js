@@ -53,9 +53,9 @@ export default function SiteLayout({ children }) {
           rel="noopener noreferrer"
         >
           ©{new Date().getFullYear()} Salman Dabbakuti. Powered Superfluid &
-          Base
+          Polygon Mumbai
         </a>
-        <p style={{ fontSize: "12px" }}>v0.30.3</p>
+        <p style={{ fontSize: "12px" }}>v0.30.4</p>
       </Footer>
     </Layout>
   );

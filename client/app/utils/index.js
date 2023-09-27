@@ -13,13 +13,11 @@ const contractABI = [
   "function tokenURI(uint256 tokenId) view returns (string)"
 ];
 
-export const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "0xF48be574c4F32430324067817B1FF49FC3ea9618";
-export const supportedTokenAddress =
-  process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_ADDRESS ||
-  "0x4dB26C973FaE52f43Bd96A8776C2bf1b0DC29556";
-
-export const supportedTokenSymbol =
-  process.env.NEXT_PUBLIC_SUPPORTED_TOKEN_SYMBOL || "USDbCx";
+export const contractAddress = "0x48A822ef187a82C3bd4c8218C9bE5DC7802d77c3";
+export const supportedTokenAddress = "0x5d8b4c2554aeb7e86f387b4d6c00ac33499ed01f";
+export const supportedTokenSymbol = "fDAIx";
+export const explorerURL = "https://mumbai.polygonscan.com";
+export const openseaURL = "https://testnets.opensea.io/assets/mumbai";
 
 export const contract = new Contract(contractAddress, contractABI);
 

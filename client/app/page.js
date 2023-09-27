@@ -37,7 +37,9 @@ import {
   supportedTokenSymbol,
   calculateFlowRateInTokenPerMonth,
   calculateTotalStreamedSinceLastUpdate,
-  contract
+  contract,
+  explorerURL,
+  openseaURL
 } from "./utils";
 import styles from "./page.module.css";
 
@@ -245,11 +247,11 @@ export default function Home() {
                                 <Space>
                                   Sender (You)
                                   <a
-                                    href={`https://basescan.org/address/${stream?.sender}`}
+                                    href={`${explorerURL}/address/${stream?.sender}`}
                                     target="_blank"
                                     rel="noreferrer"
                                   >
-                                    <ExportOutlined title="View on Basescan" />
+                                    <ExportOutlined title="View on Explorer" />
                                   </a>
                                 </Space>
                               }
@@ -272,11 +274,11 @@ export default function Home() {
                                 <Space>
                                   Receiver (Contract)
                                   <a
-                                    href={`https://basescan.org/address/${stream?.receiver}`}
+                                    href={`${explorerURL}/address/${stream?.receiver}`}
                                     target="_blank"
                                     rel="noreferrer"
                                   >
-                                    <ExportOutlined title="View on Basescan" />
+                                    <ExportOutlined title="View on Explorer" />
                                   </a>
                                 </Space>
                               }
@@ -304,7 +306,7 @@ export default function Home() {
                             <b>
                               0.01{" "}
                               <a
-                                href={`https://basescan.org/token/${supportedTokenAddress}`}
+                                href={`${explorerURL}/token/${supportedTokenAddress}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
@@ -347,7 +349,7 @@ export default function Home() {
                               <b>
                                 0.01{" "}
                                 <a
-                                  href={`https://basescan.org/token/${supportedTokenAddress}`}
+                                  href={`${explorerURL}/token/${supportedTokenAddress}`}
                                   target="_blank"
                                   rel="noreferrer"
                                 >
@@ -415,7 +417,7 @@ export default function Home() {
                                   <Space>
                                     {item?.name}
                                     <a
-                                      href={`https://opensea.io/assets/base/${contractAddress}/${item?.id}`}
+                                      href={`${openseaURL}/${contractAddress}/${item?.id}`}
                                       target="_blank"
                                       rel="noreferrer"
                                     >
