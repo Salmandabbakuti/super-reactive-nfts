@@ -24,8 +24,11 @@ createWeb3Modal({
   wagmiConfig,
   projectId,
   chains: supportedChains,
+  defaultChain: base,
   themeMode: "light",
-  defaultChain: base
+  themeVariables: {
+    "--w3m-z-index": 9999
+  }
 });
 
 export default function Web3Provider({ children }) {
