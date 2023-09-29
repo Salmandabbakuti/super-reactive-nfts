@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Web3Provider } from "@ethersproject/providers";
 import { isAddress } from "@ethersproject/address";
+import { formatEther } from "@ethersproject/units";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useAccount } from "wagmi";
@@ -49,6 +50,7 @@ dayjs.extend(relativeTime);
 export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
   const [stream, setStream] = useState(null);
+  const [minimuRequiredDeposit, setMinimumRequiredDeposit] = useState(1);
   const [provider, setProvider] = useState(null);
   const [loading, setLoading] = useState({ connect: false });
   const [items, setItems] = useState([]);
@@ -110,6 +112,17 @@ export default function Home() {
             receiver: contractAddress
           };
       console.log("stream: ", stream);
+      const minimuRequiredDeposit = await contract
+        .connect(provider)
+        .requiredDeposit();
+      const minimuRequiredDepositInToken = Math.round(
+        formatEther(minimuRequiredDeposit)
+      );
+      console.log(
+        "minimuRequiredDepositInToken: ",
+        minimuRequiredDepositInToken
+      );
+      setMinimumRequiredDeposit(minimuRequiredDepositInToken);
       setStream(stream);
       setDataLoading(false);
     } catch (err) {
@@ -305,7 +318,7 @@ export default function Home() {
                           <p>
                             *You can mint an item if you have streamed atleast{" "}
                             <b>
-                              0.01{" "}
+                              {minimuRequiredDeposit}{" "}
                               <a
                                 href={`${explorerURL}/token/${supportedTokenAddress}`}
                                 target="_blank"
@@ -348,7 +361,7 @@ export default function Home() {
                             <p>
                               *You can mint an item if you have streamed atleast{" "}
                               <b>
-                                0.01{" "}
+                                {minimuRequiredDeposit}{" "}
                                 <a
                                   href={`${explorerURL}/token/${supportedTokenAddress}`}
                                   target="_blank"
