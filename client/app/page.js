@@ -30,17 +30,18 @@ import {
 } from "@ant-design/icons";
 import CheckoutWidget from "./components/CheckoutWidget";
 import LandingPage from "./components/LandingPage";
-
+import {
+  calculateFlowRateInTokenPerMonth,
+  calculateTotalStreamedSinceLastUpdate,
+  contract
+} from "./utils";
 import {
   contractAddress,
   supportedTokenAddress,
   supportedTokenSymbol,
-  calculateFlowRateInTokenPerMonth,
-  calculateTotalStreamedSinceLastUpdate,
-  contract,
   explorerURL,
   openseaURL
-} from "./utils";
+} from "./utils/constants";
 import styles from "./page.module.css";
 
 dayjs.extend(relativeTime);

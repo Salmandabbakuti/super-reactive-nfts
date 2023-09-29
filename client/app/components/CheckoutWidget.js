@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Button, Badge } from "antd";
 import SuperfluidWidget from "@superfluid-finance/widget";
-import { supportedTokenAddress, contractAddress } from "@/app/utils";
+import { supportedTokenAddress, contractAddress, chainId } from "@/app/utils/constants";
 
 const productDetails = {
   name: "SuperUnlockable",
@@ -16,7 +16,7 @@ const paymentDetails = {
   paymentOptions: [
     {
       receiverAddress: contractAddress,
-      chainId: 80001,
+      chainId,
       superToken: {
         address: supportedTokenAddress
       }

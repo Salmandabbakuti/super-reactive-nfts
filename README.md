@@ -54,7 +54,10 @@ npx hardhat deploy --network base
 
 4. Start the client application:
 
-> Copy the `.env.example` file to `.env` and fill in the required environment variables.
+> Copy the `client/.env.example` file to `client/.env` and fill in the required environment variables.
+> Update `client/utils/constants.js` accordingly if you're using a different network/token or contract address than the default.
+
+````bash
 
 ```bash
 cd client
@@ -62,7 +65,7 @@ cd client
 npm install
 
 npm run dev
-```
+````
 
 4. Navigate to http://localhost:3000/ in your browser to view the application. Start streaming to the contract to unlock the NFTs.
 
