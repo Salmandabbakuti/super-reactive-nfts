@@ -30,7 +30,7 @@ Your SuperUnlockable item attributes are determined by your streaming data:
 
 ## Getting Started
 
-You can try out the demo [here](https://superunlockable-develop.vercel.app/).
+You can try out the demo [here](https://superunlockable.vercel.app/).
 
 > Copy the `.env.example` file to `.env` and fill in the required environment variables.
 
@@ -54,7 +54,7 @@ npx hardhat deploy --network base
 
 4. Start the client application:
 
-> Copy the `.env.example` file to `.env` and fill in the required environment variables.
+> Copy the `client/.env.example` file to `client/.env` and fill in the required environment variables. Update `client/utils/constants.js` accordingly if you're using a different network/token or contract address than the default.
 
 ```bash
 cd client

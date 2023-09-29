@@ -1,6 +1,5 @@
 "use client";
-import { Layout, Divider } from "antd";
-import { Web3Button } from "@web3modal/react";
+import { Divider, Layout } from "antd";
 import "antd/dist/reset.css";
 
 const { Header, Footer, Content } = Layout;
@@ -11,25 +10,34 @@ export default function SiteLayout({ children }) {
       <Header
         style={{
           padding: 0,
-          color: "#fff",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "0 10px"
+          color: "#fff"
         }}
       >
-        <h3>Super Unlockable</h3>
-        <Web3Button
-          balance="hide"
-          icon="show"
-          label="Connect Wallet"
-          avatar="show"
-        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "0 5px"
+          }}
+        >
+          <h3>Super Unlockable</h3>
+          <w3m-button
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "25px"
+            }}
+            size="md"
+            loadingLabel="Connecting..."
+            label="Connect Wallet"
+            balance="show"
+          />
+        </div>
       </Header>
       <Content
         style={{
-          margin: "24px 16px",
-          padding: 24,
+          margin: "12px 8px",
+          padding: 12,
           minHeight: "100%",
           color: "black",
           maxHeight: "100%"
@@ -47,7 +55,7 @@ export default function SiteLayout({ children }) {
           ©{new Date().getFullYear()} Salman Dabbakuti. Powered Superfluid &
           Base
         </a>
-        <p style={{ fontSize: "12px" }}>v0.30.2</p>
+        <p style={{ fontSize: "12px" }}>v0.30.3</p>
       </Footer>
     </Layout>
   );
