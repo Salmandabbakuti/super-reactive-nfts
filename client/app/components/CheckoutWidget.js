@@ -21,7 +21,8 @@ const paymentDetails = {
         address: supportedTokenAddress
       }
     }
-  ]
+  ],
+  modifyFlowRateBehaviour: "SET"
 };
 
 const themeOptions = {
