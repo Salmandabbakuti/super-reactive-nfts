@@ -16,18 +16,18 @@
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/units": "^5.7.0",
     "@superfluid-finance/widget": "^0.4.4",
-    "@web3modal/wagmi": "^3.0.2",
-    "antd": "^5.9.3",
+    "@web3modal/wagmi": "^3.1.0",
+    "antd": "^5.10.0",
     "dayjs": "^1.11.10",
-    "next": "13.5.3",
+    "next": "13.5.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "viem": "^1.13.1",
-    "wagmi": "^1.4.2"
+    "viem": "^1.16.2",
+    "wagmi": "^1.4.3"
   },
   "devDependencies": {
     "encoding": "^0.1.13",
-    "eslint": "8.50.0",
-    "eslint-config-next": "13.5.3"
+    "eslint": "8.51.0",
+    "eslint-config-next": "13.5.4"
   }
 }
