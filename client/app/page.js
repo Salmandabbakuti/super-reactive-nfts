@@ -1,12 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Web3Provider } from "@ethersproject/providers";
+import { useWeb3ModalAccount, useWeb3ModalSigner } from '@web3modal/ethers5/react';
 import { isAddress } from "@ethersproject/address";
 import { formatEther } from "@ethersproject/units";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useAccount } from "wagmi";
 import {
   Button,
   Input,
@@ -51,14 +50,15 @@ export default function Home() {
   const [dataLoading, setDataLoading] = useState(false);
   const [stream, setStream] = useState(null);
   const [minimuRequiredDeposit, setMinimumRequiredDeposit] = useState(1);
-  const [provider, setProvider] = useState(null);
   const [loading, setLoading] = useState({ connect: false });
   const [items, setItems] = useState([]);
   const [mintToAddress, setMintToAddress] = useState("");
   const [amountStreamedSinceLastUpdate, setAmountStreamedSinceLastUpdate] =
     useState(0);
 
-  const { address: account } = useAccount();
+  const { address: account, chainId, isConnected } = useWeb3ModalAccount();
+  const { signer, walletProvider: provider } = useWeb3ModalSigner();
+
 
   const handleDeleteStream = async () => {
     if (!account || !provider)
@@ -156,13 +156,6 @@ export default function Home() {
       message.error("Failed to get items");
     }
   };
-
-  useEffect(() => {
-    if (account) {
-      const provider = new Web3Provider(window.ethereum);
-      setProvider(provider);
-    }
-  }, [account]);
 
   useEffect(() => {
     if (provider) {
